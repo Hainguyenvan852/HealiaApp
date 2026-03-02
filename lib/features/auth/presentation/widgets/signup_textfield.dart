@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 class SignupTextField extends StatefulWidget {
 
   final String hintText;
-  final String Function(String?)? validator;
+  final String? Function(String?)? validator;
   final IconData prefixIcon;
   final bool isPassword;
+  final TextEditingController controller;
 
 
-  const SignupTextField({super.key, required this.hintText, this.validator, required this.prefixIcon, required this.isPassword});
+  const SignupTextField({super.key, required this.hintText, this.validator, required this.prefixIcon, required this.isPassword, required this.controller});
 
   @override
   State<SignupTextField> createState() => _SignupTextFieldState();
@@ -16,16 +17,28 @@ class SignupTextField extends StatefulWidget {
 
 class _SignupTextFieldState extends State<SignupTextField> {
   bool _isObscure = true;
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: widget.controller,
+      focusNode: _focusNode,
       cursorColor: Colors.black,
       obscureText: widget.isPassword ? _isObscure : false,
       onTapOutside: (event){
-        FocusScope.of(context).unfocus();
+        _focusNode.unfocus();
       },
       validator: widget.validator,
+      textInputAction: widget.isPassword
+          ? widget.hintText.toLowerCase() == 'password' ? TextInputAction.next : TextInputAction.done
+          : TextInputAction.next,
       style: TextStyle(
           fontWeight: FontWeight.w600
       ),
@@ -53,6 +66,9 @@ class _SignupTextFieldState extends State<SignupTextField> {
                 icon: Icon(Icons.visibility_off),
             )
             : null,
+        errorStyle: TextStyle(
+            fontWeight: FontWeight.bold
+        ),
         hintStyle: TextStyle(
             color: Colors.grey,
             fontSize: 15,

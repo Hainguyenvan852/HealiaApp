@@ -13,14 +13,14 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'dart:ui' as ui;
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+class ExplorePage extends StatefulWidget {
+  const ExplorePage({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  State<ExplorePage> createState() => _ExplorePageState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _ExplorePageState extends State<ExplorePage> {
 
   MapLibreMapController? mapController;
   final _panelCtrl = PanelController();
@@ -82,7 +82,7 @@ class _SearchScreenState extends State<SearchScreen> {
       await mapController!.addImage('marker-selected', bytesSelected.buffer.asUint8List());
 
       if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã nạp ảnh marker thành công')));
+        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã nạp ảnh marker thành công')));
       }
     } catch (e) {
       print("Lỗi nạp ảnh: $e");
@@ -461,11 +461,12 @@ class _SearchScreenState extends State<SearchScreen> {
                           children: [
                             Text('All treatments', style: TextStyle(
                               fontSize: 15,
-                              fontWeight: FontWeight.w500
+                              fontWeight: FontWeight.bold
                             ),),
                             Text('Current location', style: TextStyle(
                               fontSize: 15,
-                              color: Colors.black54
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold
                             ),)
                           ],
                         ),
@@ -560,7 +561,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Row(
                         children: [
                           ActionChip(
-                              label: Text('Best match'),
+                              label: Text(
+                                'Best match',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold
+                                ),
+                              ),
                               onPressed: (){},
                               backgroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -569,7 +575,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                           const SizedBox(width: 10,),
                           ActionChip(
-                              label: Text('Price'),
+                              label: Text('Price',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold
+                                ),),
                               onPressed: (){},
                               backgroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -578,7 +587,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                           const SizedBox(width: 10,),
                           ActionChip(
-                              label: Text('Options'),
+                              label: Text('Options',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold
+                                ),),
                               onPressed: (){},
                               backgroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -587,7 +599,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                           const SizedBox(width: 10,),
                           ActionChip(
-                              label: Text('Options 1'),
+                              label: Text('Options 1',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold
+                                ),),
                               onPressed: (){},
                               backgroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -596,7 +611,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                           const SizedBox(width: 10,),
                           ActionChip(
-                              label: Text('Options 2'),
+                              label: Text('Options 2',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold
+                                ),),
                               onPressed: (){},
                               backgroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -605,7 +623,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                           const SizedBox(width: 10,),
                           ActionChip(
-                              label: Text('Options 3'),
+                              label: Text('Options 3',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold
+                                ),),
                               onPressed: (){},
                               backgroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -641,7 +662,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Text(
                   '24 venues nearby',
                   style: TextStyle(
-                    color: Colors.grey.shade600
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.bold
                   ),
                 )
             ),
@@ -725,12 +747,14 @@ class _SearchScreenState extends State<SearchScreen> {
                       children: [
                         Text('3 mile', style: TextStyle(
                             color: Colors.grey.shade700,
-                            fontSize: 15
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold
                         ),),
                         Icon(Icons.fiber_manual_record, size: 5, color: Colors.grey.shade700,),
                         Text('Ba Đình, Hà Nội', style: TextStyle(
                             color: Colors.grey.shade700,
-                            fontSize: 15
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold
                         ),),
                       ],
                     ),
@@ -770,8 +794,13 @@ class _SearchScreenState extends State<SearchScreen> {
               fontSize: 16
             ),)),
             Icon(FontAwesomeIcons.solidStar, color: Colors.orange, size: 14,),
-            Text('4.9', style: TextStyle(fontWeight: FontWeight.bold),),
-            Text('(994)', style: TextStyle(color: Colors.grey.shade700),)
+            Text('4.9',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text('(994)',
+              style: TextStyle(color: Colors.grey.shade700,
+                fontWeight: FontWeight.bold),
+              )
           ],
         ),
         Row(
@@ -779,12 +808,14 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             Text('3 mile', style: TextStyle(
                 color: Colors.grey.shade700,
-                fontSize: 15
+                fontSize: 15,
+                fontWeight: FontWeight.bold
             ),),
             Icon(Icons.fiber_manual_record, size: 5, color: Colors.grey.shade700,),
             Text('Ba Đình, Hà Nội', style: TextStyle(
                 color: Colors.grey.shade700,
-                fontSize: 15
+                fontSize: 15,
+                fontWeight: FontWeight.bold
             ),),
           ],
         ),
@@ -805,18 +836,18 @@ class _SearchScreenState extends State<SearchScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('The Dao Massage', style: TextStyle(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
                     fontSize: 15
                   ),),
                   Text('330,000 đ', style: TextStyle(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),)
                 ],
               ),
               Text('1 hr - 2 hr', style: TextStyle(
                 color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.bold,
                 fontSize: 15
               ),)
             ],
@@ -839,18 +870,18 @@ class _SearchScreenState extends State<SearchScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('The Dao Massage', style: TextStyle(
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                       fontSize: 15
                   ),),
                   Text('330,000 đ', style: TextStyle(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),)
                 ],
               ),
               Text('1 hr - 2 hr', style: TextStyle(
                   color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.bold,
                   fontSize: 15
               ),)
             ],
@@ -873,18 +904,18 @@ class _SearchScreenState extends State<SearchScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('The Dao Massage', style: TextStyle(
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                       fontSize: 15
                   ),),
                   Text('330,000 đ', style: TextStyle(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),)
                 ],
               ),
               Text('1 hr - 2 hr', style: TextStyle(
                   color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.bold,
                   fontSize: 15
               ),)
             ],
@@ -895,7 +926,11 @@ class _SearchScreenState extends State<SearchScreen> {
             style: TextButton.styleFrom(
               foregroundColor: Colors.purple
             ),
-            child: Text('See all services',)
+            child: Text('See all services',
+              style: TextStyle(
+                fontWeight: FontWeight.bold
+              ),
+            )
         )
       ],
     );

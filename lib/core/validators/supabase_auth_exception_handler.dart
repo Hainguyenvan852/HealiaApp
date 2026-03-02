@@ -32,6 +32,14 @@ class SupabaseAuthExceptionHandler {
       return 'Please fill all required fields';
     }
 
-    return 'An unexpected error occurred. Please try again.';
+    if (message.contains('token has expired or invalid')) {
+      return 'Token has expired or invalid';
+    }
+
+    if (message.contains('Failed to sign in with Google')) {
+      return 'Failed to sign in with Google';
+    }
+
+    return message;
   }
 }

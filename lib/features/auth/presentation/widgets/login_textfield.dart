@@ -6,8 +6,9 @@ class LoginTextField extends StatefulWidget {
   final bool isPassword;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final TextEditingController controller;
   final String? Function(String?)? validator;
-  const LoginTextField({super.key, this.title, required this.hint, required this.isPassword, this.prefixIcon, this.validator, this.suffixIcon});
+  const LoginTextField({super.key, this.title, required this.hint, required this.isPassword, this.prefixIcon, this.validator, this.suffixIcon, required this.controller});
 
   @override
   State<LoginTextField> createState() => _LoginTextFieldState();
@@ -16,11 +17,18 @@ class LoginTextField extends StatefulWidget {
 class _LoginTextFieldState extends State<LoginTextField> {
 
   late bool _obscureText;
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _obscureText = widget.isPassword;
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
   }
 
   void _toggleVisibility(){
@@ -39,11 +47,19 @@ class _LoginTextFieldState extends State<LoginTextField> {
             : SizedBox.shrink(),
         const SizedBox(height: 10,),
         TextFormField(
+          controller: widget.controller,
+          focusNode: _focusNode,
           style: TextStyle(
               fontWeight: FontWeight.w600
           ),
+          textInputAction: widget.isPassword
+              ? TextInputAction.done
+              : TextInputAction.next,
           obscureText: _obscureText,
           cursorColor: Colors.black,
+          onTapOutside: (event){
+            _focusNode.unfocus();
+          },
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               hintText: widget.hint,
@@ -51,6 +67,9 @@ class _LoginTextFieldState extends State<LoginTextField> {
                   color: Colors.grey,
                   fontSize: 15,
                   fontWeight: FontWeight.w600
+              ),
+              errorStyle: TextStyle(
+                fontWeight: FontWeight.bold
               ),
               enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),

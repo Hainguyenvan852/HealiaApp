@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 void main(){
   runApp(MaterialApp(
     home: LandingPage(),
   ));
 }
-
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -104,6 +104,7 @@ class _SlideButtonState extends State<SlideButton>
         },
         onTap: () {
           _animationController.reset();
+          context.go('/auth-gate');
         },
         onHorizontalDragEnd: (_) {
           _animationController.reset();

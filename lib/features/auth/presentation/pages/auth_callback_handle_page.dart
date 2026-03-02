@@ -1,6 +1,7 @@
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:healio_app/features/landing/splash_screen.dart';
 
 class AuthCallbackHandlePage extends StatefulWidget { //kiểm tra xem App được mở lên bởi đường link nào không
   const AuthCallbackHandlePage({super.key});
@@ -20,9 +21,9 @@ class _AuthCallbackHandlePageState extends State<AuthCallbackHandlePage> {
     AppLinks().uriLinkStream.listen((uri) {
       final type = uri.queryParameters['type'];
       if (type == 'recovery') {
-        context.go('/reset-password-form');
+        context.go('/reset-password');
       } else {
-        context.go('/auth-gate');
+        context.go('/home');
       }
     });
   }
@@ -33,24 +34,18 @@ class _AuthCallbackHandlePageState extends State<AuthCallbackHandlePage> {
     final type  = uri?.queryParameters['type'];
 
     if(uri == null){
-      context.go('/auth-gate');
+      context.go('/home');
     } else{
       if(type == 'recovery'){
         context.go('/reset-password');
       } else{
-        context.go('/auth-gate');
+        context.go('/home');
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(
-          color: Colors.black,
-        ),
-      ),
-    );
+    return const SplashScreen();
   }
 }

@@ -7,22 +7,8 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/icons/logo-healio-app.png',),
-            const SizedBox(
-              height: 40,
-              width: 40,
-              child: CircularProgressIndicator(
-                color: Color(0xFFF48FB1),
-                strokeWidth: 3
-              ),
-            ),
-          ],
-        ),
+        child: Image.asset('assets/images/logo-healio-app.png', width: 200,),
       ),
     );
   }
