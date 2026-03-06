@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:healio_app/features/home/presentation/widgets/explore_page_shimmer.dart';
 import 'package:healio_app/features/home/presentation/widgets/image_slide.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -28,6 +29,8 @@ class _ExplorePageState extends State<ExplorePage> {
   bool isShowCard = false;
   final ValueNotifier<double> _panelPositionNotifier = ValueNotifier(0.0);
   final _hideOffset = 200; // Vị trí dấu đi card thông tin cửa hàng
+
+  bool isLoading = false;
 
   final List<Map<String, dynamic>> _stores = [
     {
@@ -427,61 +430,63 @@ class _ExplorePageState extends State<ExplorePage> {
             ),
           ),
           Positioned(
-            top: 60,
+            top: 50,
             left: 10,
             right: 10,
-            child: Container(
-              width: double.infinity,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: (){
+            child: isLoading
+                ? const SearchBarShimmer()
+                : Container(
+                    width: double.infinity,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: (){
 
-                    },
-                    icon: Icon(FontAwesomeIcons.search, size: 20,),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: (){
-
-                      },
-                      child: Container(
-                        color: Colors.white,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('All treatments', style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold
-                            ),),
-                            Text('Current location', style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black54,
-                              fontWeight: FontWeight.bold
-                            ),)
-                          ],
+                          },
+                          icon: Icon(FontAwesomeIcons.search, size: 20,),
                         ),
-                      ),
-                    )
-                  ),
-                  IconButton.outlined(
-                    onPressed: (){
-                      _panelCtrl.open();
-                    },
-                    icon: Icon(FontAwesomeIcons.list, size: 20,),
-                  ),
-                ],
-              ),
-            )
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: (){
+
+                            },
+                            child: Container(
+                              color: Colors.white,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('All treatments', style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold
+                                  ),),
+                                  Text('Current location', style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.bold
+                                  ),)
+                                ],
+                              ),
+                            ),
+                          )
+                        ),
+                        IconButton.outlined(
+                          onPressed: (){
+                            _panelCtrl.open();
+                          },
+                          icon: Icon(FontAwesomeIcons.list, size: 20,),
+                        ),
+                      ],
+                    ),
+                  )
           ),
           if(isShowCard)
             ValueListenableBuilder<double>(
@@ -503,147 +508,151 @@ class _ExplorePageState extends State<ExplorePage> {
                 );
               },
             ),
-          Positioned(
-            bottom: 100,
-            right: 10,
-            child: Transform.translate(
-              offset: Offset(0, _panelPositionNotifier.value * _hideOffset),
-              child: IconButton(
-                  onPressed: () async{
-                    _flyToMe();
+          isLoading
+              ? SizedBox.shrink()
+              : Positioned(
+                bottom: 100,
+                right: 10,
+                child: Transform.translate(
+                  offset: Offset(0, _panelPositionNotifier.value * _hideOffset),
+                  child: IconButton(
+                      onPressed: () async{
+                        _flyToMe();
+                      },
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white,
+                      ),
+                      icon: const Icon(Icons.my_location, color: Colors.black, size: 20,)
+                  ),
+                ),
+              ),
+          isLoading
+              ? SlidingUpShimmer(panelCtrl: _panelCtrl, panelPositionNotifier: _panelPositionNotifier)
+              : SlidingUpPanel(
+                  maxHeight: 700,
+                  minHeight: 80,
+                  controller: _panelCtrl,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+                  defaultPanelState: PanelState.CLOSED,
+                  onPanelSlide: (double pos) {
+                    setState(() {
+                      _panelPositionNotifier.value = pos;
+                    });
                   },
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.white,
-                  ),
-                  icon: const Icon(Icons.my_location, color: Colors.black, size: 20,)
-              ),
-            ),
-          ),
-          SlidingUpPanel(
-            maxHeight: 700,
-            minHeight: 80,
-            controller: _panelCtrl,
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-            defaultPanelState: PanelState.CLOSED,
-            onPanelSlide: (double pos) {
-              setState(() {
-                _panelPositionNotifier.value = pos;
-              });
-            },
-            header: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: [
-                  GestureDetector(
-                    behavior: HitTestBehavior.translucent, // Bắt sự kiện ngay cả vùng trống
-                    onVerticalDragUpdate: (details) {
-                      _panelCtrl.panelPosition -= details.primaryDelta! / 600;
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      color: Colors.transparent,
-                      child: Container(
-                        width: 60,
-                        height: 4,
-                        decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(10)
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          ActionChip(
-                              label: Text(
-                                'Best match',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold
-                                ),
+                  header: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          behavior: HitTestBehavior.translucent, // Bắt sự kiện ngay cả vùng trống
+                          onVerticalDragUpdate: (details) {
+                            _panelCtrl.panelPosition -= details.primaryDelta! / 600;
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            color: Colors.transparent,
+                            child: Container(
+                              width: 60,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                  color: Colors.grey,
+                                  borderRadius: BorderRadius.circular(10)
                               ),
-                              onPressed: (){},
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)
-                              )
+                            ),
                           ),
-                          const SizedBox(width: 10,),
-                          ActionChip(
-                              label: Text('Price',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),),
-                              onPressed: (){},
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)
-                              )
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                ActionChip(
+                                    label: Text(
+                                      'Best match',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold
+                                      ),
+                                    ),
+                                    onPressed: (){},
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15)
+                                    )
+                                ),
+                                const SizedBox(width: 10,),
+                                ActionChip(
+                                    label: Text('Price',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold
+                                      ),),
+                                    onPressed: (){},
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15)
+                                    )
+                                ),
+                                const SizedBox(width: 10,),
+                                ActionChip(
+                                    label: Text('Options',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold
+                                      ),),
+                                    onPressed: (){},
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15)
+                                    )
+                                ),
+                                const SizedBox(width: 10,),
+                                ActionChip(
+                                    label: Text('Options 1',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold
+                                      ),),
+                                    onPressed: (){},
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15)
+                                    )
+                                ),
+                                const SizedBox(width: 10,),
+                                ActionChip(
+                                    label: Text('Options 2',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold
+                                      ),),
+                                    onPressed: (){},
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15)
+                                    )
+                                ),
+                                const SizedBox(width: 10,),
+                                ActionChip(
+                                    label: Text('Options 3',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold
+                                      ),),
+                                    onPressed: (){},
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15)
+                                    )
+                                )
+                              ],
+                            ),
                           ),
-                          const SizedBox(width: 10,),
-                          ActionChip(
-                              label: Text('Options',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),),
-                              onPressed: (){},
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)
-                              )
-                          ),
-                          const SizedBox(width: 10,),
-                          ActionChip(
-                              label: Text('Options 1',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),),
-                              onPressed: (){},
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)
-                              )
-                          ),
-                          const SizedBox(width: 10,),
-                          ActionChip(
-                              label: Text('Options 2',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),),
-                              onPressed: (){},
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)
-                              )
-                          ),
-                          const SizedBox(width: 10,),
-                          ActionChip(
-                              label: Text('Options 3',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),),
-                              onPressed: (){},
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)
-                              )
-                          )
-                        ],
-                      ),
+                        )
+                      ],
                     ),
-                  )
-                ],
-              ),
-            ),
-            panelBuilder: (ScrollController scrollController){
-              return _buildStoreList(controller: scrollController);
-            },
-          )
+                  ),
+                  panelBuilder: (ScrollController scrollController){
+                    return _buildStoreList(controller: scrollController);
+                  },
+                )
         ],
       ),
     );
@@ -690,7 +699,7 @@ class _ExplorePageState extends State<ExplorePage> {
 
   Widget _salonInfoCard({
     required Map store
-}) {
+  }) {
     return Container(
       height: 300,
       decoration: BoxDecoration(

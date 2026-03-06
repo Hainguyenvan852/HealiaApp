@@ -1,3 +1,4 @@
+import 'package:healio_app/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthRepository {
@@ -7,10 +8,11 @@ abstract class AuthRepository {
   Future<AuthResponse> verifyUserAccount(String email, String token);
   Future<ResendResponse> resendVerificationToken(String email);
   Future<AuthResponse> signInWithGoogle();
-  Future<bool> signInWithFacebook();
+  Future<AuthResponse> signInWithFacebook();
   Future<bool> isEmailExist(String email);
   Future<void> resetPassword(String email);
   Future<UserResponse> updatePassword(String newPassword);
   String? getCurrentUserEmail();
   Session? checkUserSession();
+  Future<UserModel> getUserInfo(String userId);
 }

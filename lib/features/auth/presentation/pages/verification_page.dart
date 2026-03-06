@@ -36,7 +36,7 @@ class _VerificationPageState extends State<VerificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
+    return BlocConsumer<AuthBloc, OAuthState>(
         listener: (context, state){
           if (state is AuthSuccess) {
             SnackBarHelper.showSuccess('Create account success');

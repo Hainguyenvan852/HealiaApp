@@ -15,7 +15,6 @@ class _StoreImageSliderState extends State<StoreImageSlider> {
 
   final PageController _pageController = PageController();
 
-
   @override
   void dispose() {
     _pageController.dispose();

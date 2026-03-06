@@ -1,6 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:healio_app/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthDataSource {
@@ -93,16 +94,36 @@ class AuthDataSource {
     );
   }
 
-  Future<bool> signInWithFacebook() async {
-    return await _supabase.auth.signInWithOAuth(
-      OAuthProvider.facebook,
-      redirectTo: kIsWeb
-          ? 'https://cuscgyubgzsejppmkcif.supabase.co/auth/v1/callback'
-          : '<package-name>://auth-callback',
-      authScreenLaunchMode: kIsWeb
-          ? LaunchMode.platformDefault
-          : LaunchMode.externalApplication,
-    );
+  Future<AuthResponse> signInWithFacebook() async {
+    try {
+      final LoginResult result = await FacebookAuth.instance.login(
+        permissions: ['public_profile', 'email'],
+      );
+      if (result.status == LoginStatus.success) {
+        final accessToken = result.accessToken!.tokenString;
+        return await Supabase.instance.client.auth.signInWithIdToken(
+          provider: OAuthProvider.facebook,
+          idToken: accessToken,
+        );
+
+      } else {
+        // Handle login cancellation or failure
+        throw Exception('Facebook login failed: ${result.status}');
+      }
+    } catch (e) {
+      // Handle errors
+      throw Exception('Facebook authentication error: ${e.toString()}');
+    }
+
+    // return await _supabase.auth.signInWithOAuth(
+    //   OAuthProvider.facebook,
+    //   redirectTo: kIsWeb
+    //       ? 'https://cuscgyubgzsejppmkcif.supabase.co/auth/v1/callback'
+    //       : 'io.supabase.flutterapp://auth-callback',
+    //   authScreenLaunchMode: kIsWeb
+    //       ? LaunchMode.platformDefault
+    //       : LaunchMode.externalApplication,
+    // );
   }
 
   Future<bool> isEmailExist(String email) async{
@@ -123,7 +144,7 @@ class AuthDataSource {
     try {
       final response = await _supabase.auth.resetPasswordForEmail(
         email,
-        redirectTo: 'io.supabase.flutterapp://auth-callback?type=recovery',
+        redirectTo: 'io.supabase.flutterapp://auth-callback',
       );
       return response;
     } on AuthException catch (e) {
@@ -138,6 +159,7 @@ class AuthDataSource {
       final response = await _supabase.auth.updateUser(
         UserAttributes(password: newPassword),
       );
+
       return response;
     } on AuthException catch (e) {
       throw AuthException(e.message);
@@ -170,5 +192,15 @@ class AuthDataSource {
     } catch (e) {
       throw Exception({e.toString()});
     }
+  }
+
+  Future<UserModel> getUserInfo(String userId) async{
+    final jsonResult = await _supabase
+        .from('profiles')
+        .select('id, full_name, phone_number, avatar_url, email, date_of_birth, gender')
+        .filter('id', 'eq', userId)
+        .single();
+
+    return UserModel.fromJson(jsonResult);
   }
 }

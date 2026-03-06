@@ -38,7 +38,7 @@ class _SignupPageState extends State<SignupPage>{
   Widget build(BuildContext context) {
     bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
-    return BlocConsumer<AuthBloc, AuthState>(
+    return BlocConsumer<AuthBloc, OAuthState>(
       listenWhen: (previous, current) => previous != current,
         listener: (context, state){
           if(state is EmailVerificationRequired){

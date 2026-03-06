@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:healio_app/features/auth/presentation/bloc/auth_bloc.dart';
 
 class AppointmentPage extends StatefulWidget {
@@ -23,14 +24,16 @@ class _AppointmentPageState extends State<AppointmentPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 60,),
-              const Text('Appointments', style: TextStyle(
+              Text('Appointments', style: GoogleFonts.quicksand(
                 fontWeight: FontWeight.bold,
                 fontSize: 26
               ),),
               const SizedBox(height: 30,),
-              BlocBuilder<AuthBloc, AuthState>(
+              BlocBuilder<AuthBloc, OAuthState>(
                   builder: (context, state){
-                    if(state is AuthSuccess || state is AuthFacebookSignInSuccess || state is AuthGoogleSignInSuccess){
+                    if(state is AuthSuccess
+                        // || state is AuthFacebookSignInSuccess || state is AuthGoogleSignInSuccess
+                    ){
                       return Container(
                         height: 380,
                         width: double.infinity,

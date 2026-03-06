@@ -1,6 +1,7 @@
 
 import 'package:gotrue/gotrue.dart';
 import 'package:healio_app/features/auth/data/datasource/auth_datasource.dart';
+import 'package:healio_app/features/auth/data/models/user_model.dart';
 import 'package:healio_app/features/auth/domain/repositories/auth_repository.dart';
 
 class IAuthRepository implements AuthRepository{
@@ -35,7 +36,7 @@ class IAuthRepository implements AuthRepository{
   }
 
   @override
-  Future<bool> signInWithFacebook() {
+  Future<AuthResponse> signInWithFacebook() {
     return _authDatasource.signInWithFacebook();
   }
 
@@ -67,6 +68,11 @@ class IAuthRepository implements AuthRepository{
   @override
   Future<ResendResponse> resendVerificationToken(String email) {
     return _authDatasource.resendToken(email);
+  }
+
+  @override
+  Future<UserModel> getUserInfo(String userId) {
+    return _authDatasource.getUserInfo(userId);
   }
 
 }

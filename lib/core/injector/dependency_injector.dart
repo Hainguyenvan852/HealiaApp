@@ -8,6 +8,7 @@ import 'package:healio_app/features/auth/domain/usecases/check_email_exist_useca
 import 'package:healio_app/features/auth/domain/usecases/check_user_session_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/facebook_sign_in_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/get_user_email_usecase.dart';
+import 'package:healio_app/features/auth/domain/usecases/get_user_info_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/google_sign_in_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/resend_verification_token.dart';
 import 'package:healio_app/features/auth/domain/usecases/reset_password_usecase.dart';
@@ -47,8 +48,9 @@ Future<void> initDependencies() async{
   inj.registerLazySingleton<SignOutUseCase>(() => SignOutUseCase(inj<AuthRepository>()));
   inj.registerLazySingleton<SignUpUseCase>(() => SignUpUseCase(inj<AuthRepository>()));
   inj.registerLazySingleton<UpdatePasswordUseCase>(() => UpdatePasswordUseCase(inj<AuthRepository>()));
-  inj.registerLazySingleton<VerifyUserAccount>(() => VerifyUserAccount(inj<AuthRepository>()));
-  inj.registerLazySingleton<ResendVerificationToken>(() => ResendVerificationToken(inj<AuthRepository>()));
+  inj.registerLazySingleton<VerifyUserAccountUseCase>(() => VerifyUserAccountUseCase(inj<AuthRepository>()));
+  inj.registerLazySingleton<ResendVerificationTokenUseCase>(() => ResendVerificationTokenUseCase(inj<AuthRepository>()));
+  inj.registerLazySingleton<GetUserInfoUseCase>(() => GetUserInfoUseCase(inj<AuthRepository>()));
 
   //Blocs
   inj.registerLazySingleton<AuthBloc>(
@@ -63,8 +65,9 @@ Future<void> initDependencies() async{
         updatePasswordUseCase: inj<UpdatePasswordUseCase>(),
         getUserEmailUseCase: inj<GetUserEmailUseCase>(),
         checkUserSessionUseCase: inj<CheckUserSessionUseCase>(),
-        verifyUserAccount: inj<VerifyUserAccount>(),
-        resendVerificationToken: inj<ResendVerificationToken>(),
+        verifyUserAccountUseCase: inj<VerifyUserAccountUseCase>(),
+        resendVerificationTokenUseCase: inj<ResendVerificationTokenUseCase>(),
+        getUserInfoUseCase: inj<GetUserInfoUseCase>(),
       )
   );
 

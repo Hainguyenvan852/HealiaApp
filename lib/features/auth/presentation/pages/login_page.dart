@@ -48,18 +48,17 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
+    return BlocConsumer<AuthBloc, OAuthState>(
       listenWhen: (previous, current) => previous != current,
         listener: (context, state){
-          if (state is AuthSuccess ||
-              state is AuthFacebookSignInSuccess ||
-              state is AuthGoogleSignInSuccess) {
+          if (state is AuthSuccess
+              // ||
+              // state is AuthFacebookSignInSuccess ||
+              // state is AuthGoogleSignInSuccess
+          ) {
             context.go('/profile');
           }
           if(state is AuthError){
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //     SnackBar(content: Text(state.errorMsg))
-            // );
             SnackBarHelper.showError(state.errorMsg);
           }
         },
@@ -92,11 +91,11 @@ class _LoginPageState extends State<LoginPage> {
                         ),
 
                         const SizedBox(height: 20,),
-                        const Text(
+                        Text(
                           'Welcome back',
-                          style: TextStyle(
+                          style: GoogleFonts.quicksand(
                               fontSize: 27,
-                              fontWeight: FontWeight.w600
+                              fontWeight: FontWeight.bold
                           ),
                         ),
                         const SizedBox(height: 10,),
@@ -233,7 +232,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           );
         },
-
     );
   }
 }

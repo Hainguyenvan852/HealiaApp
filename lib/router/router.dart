@@ -5,6 +5,7 @@ import 'package:healio_app/core/services/auth_gate.dart';
 import 'package:healio_app/features/auth/presentation/pages/auth_callback_handle_page.dart';
 import 'package:healio_app/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:healio_app/features/auth/presentation/pages/login_page.dart';
+import 'package:healio_app/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:healio_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:healio_app/features/auth/presentation/pages/verification_page.dart';
 import 'package:healio_app/features/home/presentation/pages/appointment_page.dart';
@@ -80,7 +81,7 @@ class AppRouter{
           GoRoute(
               path: '/reset-password',
               name: 'reset-password',
-              builder: (context, state) => const SizedBox()
+              builder: (context, state) => const ResetPasswordPage()
           ),
           GoRoute(
               path: '/auth-callback',

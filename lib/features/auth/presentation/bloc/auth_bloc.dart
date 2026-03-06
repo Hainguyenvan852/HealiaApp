@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:healio_app/features/auth/data/models/user_model.dart';
 import 'package:healio_app/features/auth/domain/usecases/facebook_sign_in_usecase.dart';
+import 'package:healio_app/features/auth/domain/usecases/get_user_info_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/google_sign_in_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/verify_user_account.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -19,7 +21,7 @@ import '../../domain/usecases/update_password_usecase.dart';
 part 'auth_state.dart';
 part 'auth_event.dart';
 
-class AuthBloc extends Bloc<AuthEvent, AuthState> {
+class AuthBloc extends Bloc<AuthEvent, OAuthState> {
   final SignInUseCase signInUserUseCase;
   final SignUpUseCase signUpUserUseCase;
   final SignOutUseCase signOutUserUseCase;
@@ -30,8 +32,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final UpdatePasswordUseCase updatePasswordUseCase;
   final GetUserEmailUseCase getUserEmailUseCase;
   final CheckUserSessionUseCase checkUserSessionUseCase;
-  final VerifyUserAccount verifyUserAccount;
-  final ResendVerificationToken resendVerificationToken;
+  final VerifyUserAccountUseCase verifyUserAccountUseCase;
+  final ResendVerificationTokenUseCase resendVerificationTokenUseCase;
+  final GetUserInfoUseCase getUserInfoUseCase;
   AuthBloc({
     required this.signInUserUseCase,
     required this.signUpUserUseCase,
@@ -42,20 +45,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.resetPasswordUseCase,
     required this.updatePasswordUseCase,
     required this.getUserEmailUseCase,
-    required this.checkUserSessionUseCase, required this.verifyUserAccount,
-    required this.resendVerificationToken,
+    required this.checkUserSessionUseCase,
+    required this.verifyUserAccountUseCase,
+    required this.resendVerificationTokenUseCase,
+    required this.getUserInfoUseCase,
   }) : super(AuthInitial()) {
 
-    on<AuthChecked>((event, emit){
+    on<AuthChecked>((event, emit) async{
       final session = checkUserSessionUseCase.call();
       if(session != null){
-        if(session.user.appMetadata['provider'] == 'email'){
-          emit(AuthSuccess(session.user));
-        } else if(session.user.appMetadata['provider'] == 'google'){
-          emit(AuthGoogleSignInSuccess(session.user));
-        } else if (session.user.appMetadata['provider'] == 'facebook'){
-          emit(AuthFacebookSignInSuccess());
-        }
+        final user = await getUserInfoUseCase.call(session.user.id);
+        emit(AuthSuccess(user));
+
+        // if(session.user.appMetadata['provider'] == 'email'){
+        //   emit(AuthSuccess(session.user));
+        // } else if(session.user.appMetadata['provider'] == 'google'){
+        //   emit(AuthGoogleSignInSuccess(session.user));
+        // } else if (session.user.appMetadata['provider'] == 'facebook'){
+        //   emit(AuthFacebookSignInSuccess());
+        // }
       }
     });
 
@@ -87,8 +95,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<VerifyEmailRequest>((event, emit) async{
       emit(AuthLoading());
       try{
-        final response = await verifyUserAccount.call(event.email, event.token);
-        emit(AuthSuccess(response.user!));
+        final response = await verifyUserAccountUseCase.call(event.email, event.token);
+        final user = await getUserInfoUseCase.call(response.user!.id);
+        emit(AuthSuccess(user));
       } catch(e){
         emit(AuthError(errorMsg: SupabaseAuthExceptionHandler.parse(e)));
       }
@@ -97,7 +106,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ResendTokenRequest>((event, emit) async{
       emit(AuthLoading());
       try{
-        final response = await resendVerificationToken.call(event.email);
+        final response = await resendVerificationTokenUseCase.call(event.email);
       } catch(e){
         emit(AuthError(errorMsg: SupabaseAuthExceptionHandler.parse(e)));
       }
@@ -107,7 +116,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       try {
         final response = await signInUserUseCase.call(event.email, event.password);
-        emit(AuthSuccess(response.user!));
+        final user = await getUserInfoUseCase.call(response.user!.id);
+        emit(AuthSuccess(user));
       } catch (e) {
         emit(AuthError(errorMsg: SupabaseAuthExceptionHandler.parse(e)));
       }
@@ -139,7 +149,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       try {
         final response = await signInWithGoogleUseCase.call();
-        emit(AuthGoogleSignInSuccess(response.user!));
+        final user = await getUserInfoUseCase.call(response.user!.id);
+        emit(AuthSuccess(user));
       } on AuthException catch (e) {
         emit(AuthError(errorMsg: SupabaseAuthExceptionHandler.parse(e.message)));
       } catch (e){
@@ -151,9 +162,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
 
       try {
-        await signInWithFacebookUseCase.call();
-
-        emit(AuthFacebookSignInSuccess());
+        final response = await signInWithFacebookUseCase.call();
+        final user = await getUserInfoUseCase.call(response.user!.id);
+        emit(AuthSuccess(user));
       } catch (e) {
         emit(AuthError(errorMsg: e.toString()));
       }
@@ -164,6 +175,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       try {
         await resetPasswordUseCase.call(event.email);
+
         emit(ResetPasswordRequestSuccess());
       } catch (e) {
         emit(AuthError(errorMsg: SupabaseAuthExceptionHandler.parse(e)));
@@ -171,10 +183,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<UpdatePasswordRequested>((event, emit) async {
+
       emit(AuthLoading());
 
       try {
         await updatePasswordUseCase.call(event.newPassword);
+
+        final session = Supabase.instance.client.auth.currentSession;
+        if(session != null){
+          await signOutUserUseCase.call();
+        }
         emit(UpdatePasswordSuccess());
       } catch (e) {
         emit(AuthError(errorMsg: SupabaseAuthExceptionHandler.parse(e)));

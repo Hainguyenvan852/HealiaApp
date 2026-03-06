@@ -3,9 +3,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:label="healio_app"
+        android:label="Healio"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -32,9 +32,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
-                <data
-                    android:scheme="io.supabase.flutterapp"
-                    android:host="login-callback" />
+                <data android:scheme="io.supabase.flutterapp" />
+                <data android:host="login-callback" />
+                <data android:host="auth-callback" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

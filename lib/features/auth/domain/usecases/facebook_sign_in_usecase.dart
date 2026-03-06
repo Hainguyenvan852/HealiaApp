@@ -1,3 +1,5 @@
+import 'package:gotrue/gotrue.dart';
+
 import '../repositories/auth_repository.dart';
 
 class FacebookSignInUseCase {
@@ -5,7 +7,7 @@ class FacebookSignInUseCase {
 
   FacebookSignInUseCase(this.repository);
 
-  Future<bool> call() async{
+  Future<AuthResponse> call() async{
     return await repository.signInWithFacebook();
   }
 }

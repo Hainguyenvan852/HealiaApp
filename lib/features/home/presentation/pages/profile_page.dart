@@ -1,8 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:healio_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 
 
 class ProfilePage extends StatefulWidget {
@@ -22,19 +26,375 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: BlocConsumer<AuthBloc, AuthState>(
+      body: BlocConsumer<AuthBloc, OAuthState>(
           listener: (context, state){
             if(state is AuthSignedOutSuccess){
               context.go('/home');
             }
           },
           builder: (context, state){
-            return Center(
-              child: ElevatedButton(
-                  onPressed: (){
-                    _showLogOutBottomSheet(context);
-                  },
-                  child: Text('Sign out')
+            return SafeArea(
+              child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                      children: [
+                        const SizedBox(height: 20,),
+                        state is AuthSuccess
+                        ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  state.user.fullName,
+                                  style: GoogleFonts.quicksand(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 25
+                                  ),
+                                ),
+                                Text(
+                                  'Personal account',
+                                  style: TextStyle(
+                                      fontSize: 15
+                                  ),
+                                ),
+                              ],
+                            ),
+                            state.user.avatarUrl != null
+                            ? ClipRRect(
+                              borderRadius: BorderRadius.circular(50),
+                              child: CachedNetworkImage(
+                                width: 60,
+                                height: 60,
+                                imageUrl: state.user.avatarUrl!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url){
+                                  return Shimmer(
+                                    child: Container(
+                                      width: 60,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle
+                                      ),
+                                    ),
+                                  );
+                                },
+                                errorWidget: (context, url, error){
+                                  return Center(child: Icon(Icons.error, color: Colors.white,));
+                                },
+                              ),
+                            )
+                            : ClipRRect(
+                              borderRadius: BorderRadius.circular(50),
+                              child: Container(
+                                width: 60,
+                                height: 60,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle
+                                  ),
+                                child: Image.asset('assets/images/user-avatar-default.png', fit: BoxFit.cover,)
+                              ),
+                            )
+                          ],
+                        )
+                        : SizedBox(
+                          height: 60,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Shimmer(
+                                      child: Container(
+                                          width: 200,
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                              color: Colors.grey.withValues(alpha: 0.4),
+                                          )
+                                      )
+                                  ),
+                                  const SizedBox(height: 10,),
+                                  Shimmer(
+                                      child: Container(
+                                          width: 140,
+                                          height: 10,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: Colors.grey.withValues(alpha: 0.4),
+                                          )
+                                      )
+                                  ),
+                                ],
+                              ),
+                              Shimmer(
+                                  child: Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey.withValues(alpha: 0.4),
+                                        shape: BoxShape.circle
+                                    )
+                                  )
+                              )
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 50,),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: Colors.grey.withValues(alpha: 0.5),
+                                  width: 0.8
+                              )
+                          ),
+                          child: Column(
+                            children: [
+                              FilledButton.icon(
+                                  onPressed: (){},
+                                  style: FilledButton.styleFrom(
+                                      padding: EdgeInsets.only(),
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10)
+                                      ),
+                                  ),
+                                  icon: PhosphorIcon(
+                                    PhosphorIcons.userRectangle(),
+                                    color: Colors.black,
+                                    size: 25,
+                                  ),
+                                  label: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Profile',
+                                        style: GoogleFonts.quicksand(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                            color: Colors.black
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 15,)
+                                    ],
+                                  )
+                              ),
+                              FilledButton.icon(
+                                  onPressed: (){},
+                                  style: FilledButton.styleFrom(
+                                      padding: EdgeInsets.only(),
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10)
+                                      )
+                                  ),
+                                  icon: PhosphorIcon(
+                                    PhosphorIcons.heart(),
+                                    color: Colors.black,
+                                    size: 25,
+                                  ),
+                                  label: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Favorites',
+                                        style: GoogleFonts.quicksand(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                            color: Colors.black
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 15,)
+                                    ],
+                                  )
+                              ),
+                              FilledButton.icon(
+                                  onPressed: (){},
+                                  style: FilledButton.styleFrom(
+                                      padding: EdgeInsets.only(),
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10)
+                                      )
+                                  ),
+                                  icon: PhosphorIcon(
+                                    PhosphorIcons.clipboardText(),
+                                    color: Colors.black,
+                                    size: 25,
+                                  ),
+                                  label: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Forms',
+                                        style: GoogleFonts.quicksand(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                            color: Colors.black
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 15,)
+                                    ],
+                                  )
+                              ),
+                              FilledButton.icon(
+                                  onPressed: (){},
+                                  style: FilledButton.styleFrom(
+                                      padding: EdgeInsets.only(),
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10)
+                                      )
+                                  ),
+                                  icon: PhosphorIcon(
+                                    PhosphorIcons.gearSix(),
+                                    color: Colors.black,
+                                    size: 25,
+                                  ),
+                                  label: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Settings',
+                                        style: GoogleFonts.quicksand(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                            color: Colors.black
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 15,)
+                                    ],
+                                  )
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20,),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: Colors.grey.withValues(alpha: 0.5),
+                                  width: 0.8
+                              )
+                          ),
+                          child: Column(
+                            children: [
+                              FilledButton.icon(
+                                  onPressed: (){},
+                                  style: FilledButton.styleFrom(
+                                      padding: EdgeInsets.only(),
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10)
+                                      )
+                                  ),
+                                  icon: PhosphorIcon(
+                                    PhosphorIcons.lifebuoy(),
+                                    color: Colors.black,
+                                    size: 25,
+                                  ),
+                                  label: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Support',
+                                        style: GoogleFonts.quicksand(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                            color: Colors.black
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 15,)
+                                    ],
+                                  )
+                              ),
+                              FilledButton.icon(
+                                  onPressed: (){},
+                                  style: FilledButton.styleFrom(
+                                      padding: EdgeInsets.only(),
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10)
+                                      )
+                                  ),
+                                  icon: PhosphorIcon(
+                                    PhosphorIcons.globeHemisphereWest(),
+                                    color: Colors.black,
+                                    size: 25,
+                                  ),
+                                  label: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'English (United States)',
+                                        style: GoogleFonts.quicksand(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                            color: Colors.black
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 15,)
+                                    ],
+                                  )
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20,),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: Colors.grey.withValues(alpha: 0.5),
+                                  width: 0.8
+                              )
+                          ),
+                          child: FilledButton.icon(
+                              onPressed: (){
+                                _showLogOutBottomSheet(context);
+                              },
+                              style: FilledButton.styleFrom(
+                                  padding: EdgeInsets.only(),
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                  )
+                              ),
+                              icon: PhosphorIcon(
+                                PhosphorIcons.signOut(),
+                                color: Colors.black,
+                                size: 25,
+                              ),
+                              label: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Log out',
+                                    style: GoogleFonts.quicksand(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                        color: Colors.black
+                                    ),
+                                  ),
+                                  Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 15,)
+                                ],
+                              )
+                          ),
+                        )
+                      ]
+                  )
               ),
             );
           },
@@ -52,7 +412,7 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (BuildContext sheetContext)
         => BlocProvider.value(
           value: authBloc,
-          child: BlocConsumer<AuthBloc, AuthState>(
+          child: BlocConsumer<AuthBloc, OAuthState>(
               listener: (context, state){
                 if(state is AuthSignedOutSuccess){
                   Navigator.pop(sheetContext);

@@ -2,10 +2,10 @@ import 'package:gotrue/gotrue.dart';
 
 import '../repositories/auth_repository.dart';
 
-class VerifyUserAccount {
+class VerifyUserAccountUseCase {
   final AuthRepository repository;
 
-  VerifyUserAccount(this.repository);
+  VerifyUserAccountUseCase(this.repository);
 
   Future<AuthResponse> call(String email, String token) async {
     return await repository.verifyUserAccount(email, token);
