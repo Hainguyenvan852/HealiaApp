@@ -5,7 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:healio_app/features/auth/presentation/bloc/auth_bloc.dart';
 
 class AppointmentPage extends StatefulWidget {
-  const AppointmentPage({super.key});
+  const AppointmentPage({super.key,});
+  //final StatefulNavigationShell navigationShell;
 
   @override
   State<AppointmentPage> createState() => _AppointmentPageState();
@@ -64,7 +65,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                             const SizedBox(height: 15,),
                             OutlinedButton(
                                 onPressed: (){
-
+                                  context.go('/explore');
                                 },
                                 style: ElevatedButton.styleFrom(
                                     foregroundColor: Colors.black,
@@ -114,7 +115,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                           const SizedBox(height: 15,),
                           ElevatedButton(
                               onPressed: (){
-
+                                context.go('/explore');
                               },
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.black,

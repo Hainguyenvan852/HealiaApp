@@ -9,6 +9,7 @@ import 'package:healio_app/features/home/presentation/widgets/explore_page_shimm
 import 'package:healio_app/features/home/presentation/widgets/image_slide.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -570,76 +571,132 @@ class _ExplorePageState extends State<ExplorePage> {
                             child: Row(
                               children: [
                                 ActionChip(
-                                    label: Text(
-                                      'Best match',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold
-                                      ),
+                                    label: PhosphorIcon(
+                                      PhosphorIcons.faders(),
+                                      size: 20,
                                     ),
                                     onPressed: (){},
                                     backgroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15)
+                                        borderRadius: BorderRadius.circular(20)
                                     )
                                 ),
                                 const SizedBox(width: 10,),
                                 ActionChip(
-                                    label: Text('Price',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold
-                                      ),),
+                                    label: Row(
+                                      children: [
+                                        Text(
+                                          'Best match',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5,),
+                                        Icon(Icons.keyboard_arrow_down, size: 20,)
+                                      ],
+                                    ),
                                     onPressed: (){},
                                     backgroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15)
+                                        borderRadius: BorderRadius.circular(25)
                                     )
                                 ),
                                 const SizedBox(width: 10,),
                                 ActionChip(
-                                    label: Text('Options',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold
-                                      ),),
+                                    label: Row(
+                                      children: [
+                                        Text('Amenities',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5,),
+                                        Icon(Icons.keyboard_arrow_down, size: 20,)
+                                      ],
+                                    ),
                                     onPressed: (){},
                                     backgroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15)
+                                        borderRadius: BorderRadius.circular(25)
                                     )
                                 ),
                                 const SizedBox(width: 10,),
                                 ActionChip(
-                                    label: Text('Options 1',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold
-                                      ),),
+                                    label: Row(
+                                      children: [
+                                        Text('Price',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5,),
+                                        Icon(Icons.keyboard_arrow_down, size: 20,)
+                                      ],
+                                    ),
                                     onPressed: (){},
                                     backgroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15)
+                                        borderRadius: BorderRadius.circular(25)
                                     )
                                 ),
                                 const SizedBox(width: 10,),
                                 ActionChip(
-                                    label: Text('Options 2',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold
-                                      ),),
+                                    label: Row(
+                                      children: [
+                                        Text('Options',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5,),
+                                        Icon(Icons.keyboard_arrow_down, size: 20,)
+                                      ],
+                                    ),
                                     onPressed: (){},
                                     backgroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15)
+                                        borderRadius: BorderRadius.circular(25)
                                     )
                                 ),
                                 const SizedBox(width: 10,),
                                 ActionChip(
-                                    label: Text('Options 3',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold
-                                      ),),
+                                    label: Row(
+                                      children: [
+                                        PhosphorIcon(
+                                          PhosphorIcons.sealCheck(),
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 5,),
+                                        Text('Only verified',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                     onPressed: (){},
                                     backgroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15)
+                                        borderRadius: BorderRadius.circular(25)
+                                    )
+                                ),
+                                const SizedBox(width: 10,),
+                                ActionChip(
+                                    label: Row(
+                                      children: [
+                                        Text('Type',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5,),
+                                        Icon(Icons.keyboard_arrow_down, size: 20,)
+                                      ],
+                                    ),
+                                    onPressed: (){},
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(25)
                                     )
                                 )
                               ],
