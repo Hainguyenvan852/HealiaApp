@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -60,10 +61,14 @@ class AuthDataSource {
   }
 
   Future<ResendResponse> resendToken(String email){
-    return _supabase.auth.resend(
-        type: OtpType.signup,
-        email: email
-    );
+    try{
+      return _supabase.auth.resend(
+          type: OtpType.signup,
+          email: email
+      );
+    } catch(e){
+      throw Exception(e.toString());
+    }
   }
 
   Future<AuthResponse> signInWithGoogle() async{
@@ -94,36 +99,47 @@ class AuthDataSource {
     );
   }
 
-  Future<AuthResponse> signInWithFacebook() async {
-    try {
-      final LoginResult result = await FacebookAuth.instance.login(
-        permissions: ['public_profile', 'email'],
-      );
-      if (result.status == LoginStatus.success) {
-        final accessToken = result.accessToken!.tokenString;
-        return await Supabase.instance.client.auth.signInWithIdToken(
-          provider: OAuthProvider.facebook,
-          idToken: accessToken,
-        );
+  Future<void> signInWithFacebook() async {
+    // try {
+    //   final fbAccessToken = await FacebookAuth.instance.accessToken;
+    //
+    //   if(fbAccessToken != null){
+    //     await FacebookAuth.instance.logOut();
+    //   }
+    //
+    //   final LoginResult result = await FacebookAuth.instance.login(
+    //     permissions: ['public_profile', 'email'],
+    //   );
+    //
+    //   if (result.status == LoginStatus.success) {
+    //     final accessToken = result.accessToken!.tokenString;
+    //     return await Supabase.instance.client.auth.signInWithIdToken(
+    //       provider: OAuthProvider.facebook,
+    //       idToken: accessToken,
+    //     );
+    //   } else {
+    //     // Handle login cancellation or failure
+    //     throw Exception('Facebook login failed: ${result.status}');
+    //   }
+    // } catch (e) {
+    //   // Handle errors
+    //   throw Exception('Facebook authentication error: ${e.toString()}');
+    // }
 
-      } else {
-        // Handle login cancellation or failure
-        throw Exception('Facebook login failed: ${result.status}');
-      }
-    } catch (e) {
-      // Handle errors
+    try {
+      await _supabase.auth.signInWithOAuth(
+        OAuthProvider.facebook,
+        redirectTo: kIsWeb
+            ? 'https://cuscgyubgzsejppmkcif.supabase.co/auth/v1/callback'
+            : 'io.supabase.flutterapp://auth-callback',
+        authScreenLaunchMode: kIsWeb
+            ? LaunchMode.platformDefault
+            : LaunchMode.externalApplication,
+        scopes: 'public_profile, email'
+      );
+    } catch(e){
       throw Exception('Facebook authentication error: ${e.toString()}');
     }
-
-    // return await _supabase.auth.signInWithOAuth(
-    //   OAuthProvider.facebook,
-    //   redirectTo: kIsWeb
-    //       ? 'https://cuscgyubgzsejppmkcif.supabase.co/auth/v1/callback'
-    //       : 'io.supabase.flutterapp://auth-callback',
-    //   authScreenLaunchMode: kIsWeb
-    //       ? LaunchMode.platformDefault
-    //       : LaunchMode.externalApplication,
-    // );
   }
 
   Future<bool> isEmailExist(String email) async{
@@ -170,10 +186,17 @@ class AuthDataSource {
 
   Future<void> signOut() async {
     final googleSignIn = GoogleSignIn.instance;
+    final facebookSignIn = FacebookAuth.instance;
+
     try {
       await googleSignIn.disconnect();
     } catch (e) {
       await googleSignIn.signOut();
+    }
+
+    final fbAccessToken = await facebookSignIn.accessToken;
+    if(fbAccessToken != null){
+      await facebookSignIn.logOut();
     }
 
     await _supabase.auth.signOut();

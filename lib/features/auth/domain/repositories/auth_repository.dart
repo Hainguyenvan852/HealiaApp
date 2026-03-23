@@ -8,7 +8,7 @@ abstract class AuthRepository {
   Future<AuthResponse> verifyUserAccount(String email, String token);
   Future<ResendResponse> resendVerificationToken(String email);
   Future<AuthResponse> signInWithGoogle();
-  Future<AuthResponse> signInWithFacebook();
+  Future<void> signInWithFacebook();
   Future<bool> isEmailExist(String email);
   Future<void> resetPassword(String email);
   Future<UserResponse> updatePassword(String newPassword);

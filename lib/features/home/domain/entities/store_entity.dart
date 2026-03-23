@@ -1,26 +1,30 @@
+import 'package:geolocator/geolocator.dart';
+
 class StoreEntity {
-  String id;
+  int id;
   String name;
   String email;
   String address;
-  String ward;
   String district;
   String city;
-  String country;
   String introduction;
-  String managerId;
   String phoneNumber;
-  String latitude;
-  String longitude;
-  bool isActive;
+  int ratingNumber;
+  double distance;
+  String imageUrl;
+  double rating;
+  String primaryCategory;
+  double latitude;
+  double longitude;
 
   StoreEntity({
     required this.id, required this.name,
     required this.email, required this.address,
-    required this.ward, required this.longitude,
-    required this.district, required this.city,
-    required this.country, required this.introduction,
-    required this.managerId, required this.phoneNumber,
-    required this.isActive, required this.latitude,
+    required this.ratingNumber,
+    required this.introduction, required this.phoneNumber,
+    required this.city, required this.imageUrl,
+    required this.rating, required this.district,
+    required this.longitude, required this.latitude,
+    required this.distance, required this.primaryCategory
   });
 }

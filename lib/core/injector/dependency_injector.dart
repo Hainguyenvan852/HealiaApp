@@ -18,6 +18,18 @@ import 'package:healio_app/features/auth/domain/usecases/sign_up_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/update_password_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/verify_user_account.dart';
 import 'package:healio_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:healio_app/features/home/data/datasources/store_datasource.dart';
+import 'package:healio_app/features/home/data/irepositories/istore_repository.dart';
+import 'package:healio_app/features/home/domain/repositories/store_repository.dart';
+import 'package:healio_app/features/home/domain/usecases/load_newly_store_usecase.dart';
+import 'package:healio_app/features/home/domain/usecases/load_recently_store_usecase.dart';
+import 'package:healio_app/features/home/domain/usecases/load_recommend_store_usecase.dart';
+import 'package:healio_app/features/home/domain/usecases/load_store_with_distance_usecase.dart';
+import 'package:healio_app/features/home/domain/usecases/load_store_with_id_usecase.dart';
+import 'package:healio_app/features/home/domain/usecases/load_trending_store_usecase.dart';
+import 'package:healio_app/features/home/presentation/bloc/e_store_bloc.dart';
+import 'package:healio_app/features/home/presentation/bloc/store_bloc.dart';
+import 'package:healio_app/router/router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final inj = GetIt.instance;
@@ -31,11 +43,16 @@ Future<void> initDependencies() async{
 
   final SupabaseClient supabase = Supabase.instance.client;
 
+  //Router
+  inj.registerLazySingleton<AppRouter>(() => AppRouter());
+
   //Datasource
   inj.registerLazySingleton<AuthDataSource>(() => AuthDataSource(supabase));
+  inj.registerLazySingleton<StoreDatasource>(() => StoreDatasource(supabase));
 
   //Repositories
   inj.registerLazySingleton<AuthRepository>(() => IAuthRepository(inj<AuthDataSource>()));
+  inj.registerLazySingleton<StoreRepository>(() => IStoreRepository(inj<StoreDatasource>()));
 
   //Use Cases
   inj.registerLazySingleton<CheckEmailExistUseCase>(() => CheckEmailExistUseCase(inj<AuthRepository>()));
@@ -51,6 +68,13 @@ Future<void> initDependencies() async{
   inj.registerLazySingleton<VerifyUserAccountUseCase>(() => VerifyUserAccountUseCase(inj<AuthRepository>()));
   inj.registerLazySingleton<ResendVerificationTokenUseCase>(() => ResendVerificationTokenUseCase(inj<AuthRepository>()));
   inj.registerLazySingleton<GetUserInfoUseCase>(() => GetUserInfoUseCase(inj<AuthRepository>()));
+
+  inj.registerLazySingleton<LoadRecentlyStoreUseCase>(() => LoadRecentlyStoreUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<LoadTrendingStoreUseCase>(() => LoadTrendingStoreUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<LoadNewlyStoreUseCase>(() => LoadNewlyStoreUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<LoadStoreWithIdUseCase>(() => LoadStoreWithIdUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<LoadStoreWithDistanceUseCase>(() => LoadStoreWithDistanceUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<LoadRecommendStoreUseCase>(() => LoadRecommendStoreUseCase(inj<StoreRepository>()));
 
   //Blocs
   inj.registerLazySingleton<AuthBloc>(
@@ -71,5 +95,21 @@ Future<void> initDependencies() async{
       )
   );
 
+  inj.registerLazySingleton<StoreBloc>(
+      () => StoreBloc(
+        loadRecommendStoreUseCase: inj<LoadRecommendStoreUseCase>(),
+        loadNewlyStoreUseCase: inj<LoadNewlyStoreUseCase>(),
+        loadStoreWithDistanceUseCase: inj<LoadStoreWithDistanceUseCase>(),
+        loadRecentlyStoreUseCase: inj<LoadRecentlyStoreUseCase>(),
+        loadTrendingStoreUseCase: inj<LoadTrendingStoreUseCase>(),
+        checkUserSessionUseCase: inj<CheckUserSessionUseCase>()
+      )
+  );
+
+  inj.registerLazySingleton<EStoreBloc>(
+      () => EStoreBloc(
+        loadStoreWithDistanceUseCase: inj<LoadStoreWithDistanceUseCase>()
+      )
+  );
 
 }

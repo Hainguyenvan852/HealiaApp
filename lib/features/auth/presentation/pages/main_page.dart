@@ -11,7 +11,7 @@ class MainPage extends StatelessWidget {
 
   const MainPage({super.key, required this.navigationShell});
 
-  void _onTap(BuildContext context, int index) {
+  void _onTap(BuildContext context, int index) async{
     
     final session = inj<CheckUserSessionUseCase>().call();
 

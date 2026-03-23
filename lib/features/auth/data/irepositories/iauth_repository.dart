@@ -36,7 +36,7 @@ class IAuthRepository implements AuthRepository{
   }
 
   @override
-  Future<AuthResponse> signInWithFacebook() {
+  Future<void> signInWithFacebook() {
     return _authDatasource.signInWithFacebook();
   }
 

@@ -7,7 +7,7 @@ class FacebookSignInUseCase {
 
   FacebookSignInUseCase(this.repository);
 
-  Future<AuthResponse> call() async{
+  Future<void> call() async{
     return await repository.signInWithFacebook();
   }
 }

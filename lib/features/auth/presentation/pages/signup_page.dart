@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:healio_app/core/validators/text_field_validation.dart';
+import 'package:healio_app/features/auth/presentation/widgets/auth_text_button.dart';
 import 'package:healio_app/features/auth/presentation/widgets/signup_textfield.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -221,31 +222,12 @@ class _SignupPageState extends State<SignupPage>{
                             ),)
                         ),
                         const SizedBox(height: 30,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'You already have an account?',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600
-                              ),
-                            ),
-                            const SizedBox(width: 5,),
-                            GestureDetector(
-                              onTap: state is AuthLoading
-                                  ? null
-                                  : () => context.pop(),
-                              child: Text(
-                                'Sign In',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            )
-                          ],
+                        AuthTextButton(
+                            onTap: state is AuthLoading
+                                ? null
+                                : () => context.pop(),
+                            title: 'Sign In',
+                            content: 'You already have an account?'
                         )
                       ],
                     ),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healio_app/features/auth/data/models/user_model.dart';
@@ -5,8 +7,10 @@ import 'package:healio_app/features/auth/domain/usecases/facebook_sign_in_usecas
 import 'package:healio_app/features/auth/domain/usecases/get_user_info_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/google_sign_in_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/verify_user_account.dart';
+import 'package:healio_app/router/router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/injector/dependency_injector.dart';
 import '../../../../core/validators/supabase_auth_exception_handler.dart';
 import '../../domain/usecases/check_email_exist_usecase.dart';
 import '../../domain/usecases/check_user_session_usecase.dart';
@@ -35,6 +39,8 @@ class AuthBloc extends Bloc<AuthEvent, OAuthState> {
   final VerifyUserAccountUseCase verifyUserAccountUseCase;
   final ResendVerificationTokenUseCase resendVerificationTokenUseCase;
   final GetUserInfoUseCase getUserInfoUseCase;
+
+
   AuthBloc({
     required this.signInUserUseCase,
     required this.signUpUserUseCase,
@@ -56,22 +62,13 @@ class AuthBloc extends Bloc<AuthEvent, OAuthState> {
       if(session != null){
         final user = await getUserInfoUseCase.call(session.user.id);
         emit(AuthSuccess(user));
-
-        // if(session.user.appMetadata['provider'] == 'email'){
-        //   emit(AuthSuccess(session.user));
-        // } else if(session.user.appMetadata['provider'] == 'google'){
-        //   emit(AuthGoogleSignInSuccess(session.user));
-        // } else if (session.user.appMetadata['provider'] == 'facebook'){
-        //   emit(AuthFacebookSignInSuccess());
-        // }
+      } else{
+        emit(UnAuthenticated());
       }
     });
 
-    //Kiểm tra xem còn phiên đăng nhập cũ không
-    add(AuthChecked());
-
     on<AuthReset>((event, emit) {
-      emit(AuthInitial());
+      emit(UnAuthenticated());
     });
 
     on<UserSignedUp>((event, emit) async {
@@ -116,8 +113,8 @@ class AuthBloc extends Bloc<AuthEvent, OAuthState> {
       emit(AuthLoading());
       try {
         final response = await signInUserUseCase.call(event.email, event.password);
-        final user = await getUserInfoUseCase.call(response.user!.id);
-        emit(AuthSuccess(user));
+        // final user = await getUserInfoUseCase.call(response.user!.id);
+        // emit(AuthSuccess(user));
       } catch (e) {
         emit(AuthError(errorMsg: SupabaseAuthExceptionHandler.parse(e)));
       }
@@ -149,8 +146,8 @@ class AuthBloc extends Bloc<AuthEvent, OAuthState> {
 
       try {
         final response = await signInWithGoogleUseCase.call();
-        final user = await getUserInfoUseCase.call(response.user!.id);
-        emit(AuthSuccess(user));
+        // final user = await getUserInfoUseCase.call(response.user!.id);
+        // emit(AuthSuccess(user));
       } on AuthException catch (e) {
         emit(AuthError(errorMsg: SupabaseAuthExceptionHandler.parse(e.message)));
       } catch (e){
@@ -162,11 +159,10 @@ class AuthBloc extends Bloc<AuthEvent, OAuthState> {
       emit(AuthLoading());
 
       try {
-        final response = await signInWithFacebookUseCase.call();
-        final user = await getUserInfoUseCase.call(response.user!.id);
-        emit(AuthSuccess(user));
+        await signInWithFacebookUseCase.call();
+
       } catch (e) {
-        emit(AuthError(errorMsg: e.toString()));
+        emit(AuthError(errorMsg: SupabaseAuthExceptionHandler.parse(e)));
       }
     });
 
@@ -213,5 +209,10 @@ class AuthBloc extends Bloc<AuthEvent, OAuthState> {
         emit(AuthError(errorMsg: e.toString()));
       }
     });
+
+    //Kiểm tra xem còn phiên đăng nhập cũ không
+    add(AuthChecked());
   }
+
+
 }

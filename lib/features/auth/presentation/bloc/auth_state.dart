@@ -26,6 +26,8 @@ final class AuthSuccess extends OAuthState {
   List<Object?> get props => [user];
 }
 
+final class UnAuthenticated extends OAuthState {}
+
 final class AuthEmailSuccess extends OAuthState {
   final String email;
 

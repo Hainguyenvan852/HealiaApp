@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="facebook_app_id">2316895048794155</string>
+    <string name="fb_login_protocol_scheme">fb2316895048794155</string>
+    <string name="facebook_client_token">043e1ba6527ab14edbca43025a876f6f</string>
+    <string name="app_name">Healia</string>
+</resources>

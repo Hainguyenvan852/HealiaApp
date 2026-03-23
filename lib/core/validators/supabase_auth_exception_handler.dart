@@ -40,6 +40,14 @@ class SupabaseAuthExceptionHandler {
       return 'Failed to sign in with Google';
     }
 
+    if (message.contains('Facebook login failed: LoginStatus.cancelled')) {
+      return 'Failed to sign in with Facebook';
+    }
+
+    if (message.contains('Bad ID token')) {
+      return 'Failed to sign in: Bad ID token';
+    }
+
     return message;
   }
 }

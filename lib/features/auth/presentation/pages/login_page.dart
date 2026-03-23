@@ -8,14 +8,16 @@ import 'package:healio_app/core/utils/snackbar_helper.dart';
 import 'package:healio_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:healio_app/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:healio_app/features/auth/presentation/pages/signup_page.dart';
+import 'package:healio_app/features/auth/presentation/widgets/login_header.dart';
 import 'package:healio_app/features/auth/presentation/widgets/login_textfield.dart';
 import 'package:healio_app/features/auth/presentation/widgets/oauth_button.dart';
-import 'package:healio_app/features/home/presentation/pages/appointment_page.dart';
-import 'package:healio_app/features/home/presentation/pages/explore_page.dart';
+import 'package:healio_app/features/appointment/presentation/pages/appointment_page.dart';
+import 'package:healio_app/features/explore/presentation/pages/explore_page.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../../../core/validators/text_field_validation.dart';
 import '../../../landing/splash_screen.dart';
+import '../widgets/auth_text_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -51,13 +53,9 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<AuthBloc, OAuthState>(
       listenWhen: (previous, current) => previous != current,
         listener: (context, state){
-          if (state is AuthSuccess
-              // ||
-              // state is AuthFacebookSignInSuccess ||
-              // state is AuthGoogleSignInSuccess
-          ) {
-            context.go('/profile');
-          }
+          // if (state is AuthSuccess) {
+          //   context.go('/profile');
+          // }
           if(state is AuthError){
             SnackBarHelper.showError(state.errorMsg);
           }
@@ -77,36 +75,8 @@ class _LoginPageState extends State<LoginPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 20,),
+                        LoginHeader(onTap: () => context.pop()),
 
-                        // Close Button
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const SizedBox(width: 10,),
-                            GestureDetector(
-                              onTap: () => context.pop(),
-                              child: Icon(Icons.close, color: Colors.black,),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20,),
-                        Text(
-                          'Welcome back',
-                          style: GoogleFonts.quicksand(
-                              fontSize: 27,
-                              fontWeight: FontWeight.bold
-                          ),
-                        ),
-                        const SizedBox(height: 10,),
-                        const Text(
-                          'Log in with one of the following to book and manage your appointments',
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black54,
-                              fontWeight: FontWeight.w600
-                          ),
-                        ),
                         const SizedBox(height: 30,),
                         OAuthButton(
                             title: 'With Google',
@@ -118,7 +88,9 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 20,),
                         OAuthButton(
                             title: 'With Facebook',
-                            onPressed: (){},
+                            onPressed: (){
+                              context.read<AuthBloc>().add(FacebookSignInRequested());
+                            },
                             imageAsset: 'assets/icons/facebook-logo-icon.svg'
                         ),
                         const SizedBox(height: 30,),
@@ -195,34 +167,15 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                         ),
                         const SizedBox(height: 30,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Don\'t have an account?',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600
-                              ),
-                            ),
-                            const SizedBox(width: 5,),
-                            GestureDetector(
-                              onTap: state is AuthLoading
-                                  ? null
-                                  : () {
-                                    context.read<AuthBloc>().add(AuthReset());
-                                    context.push('/signup');
-                                  },
-                              child: Text(
-                                'Sign Up',
-                                style: TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15
-                                ),
-                              ),
-                            )
-                          ],
+                        AuthTextButton(
+                            onTap: state is AuthLoading
+                              ? null
+                              : () {
+                                context.read<AuthBloc>().add(AuthReset());
+                                context.push('/signup');
+                              },
+                            title: 'Sign Up',
+                            content: 'Don\'t have an account?'
                         )
                       ],
                     ),

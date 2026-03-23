@@ -1,11 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:healio_app/features/home/data/models/store_model.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class StoreImageSlider extends StatefulWidget {
-  const StoreImageSlider({super.key});
+  const StoreImageSlider({super.key, required this.store});
+  final StoreModel store;
 
   @override
   State<StoreImageSlider> createState() => _StoreImageSliderState();
@@ -37,7 +39,7 @@ class _StoreImageSliderState extends State<StoreImageSlider> {
                   height: 230,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  imageUrl: 'https://a.storyblok.com/f/97382/2000x1500/bed8bd4c9c/pre-and-post-massage-rituals-cover.png/m/1168x946/smart/filters:quality(65)',
+                  imageUrl: widget.store.imageUrl,
                   errorWidget: (context, url, error){
                     return const Icon(FontAwesomeIcons.solidImage);
                   },
