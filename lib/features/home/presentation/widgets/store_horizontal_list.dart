@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:healio_app/features/home/data/models/store_model.dart';
+import 'package:healio_app/features/explore/data/models/store_model.dart';
 import 'package:healio_app/features/home/presentation/widgets/store_card_1.dart';
 
 import '../bloc/store_bloc.dart';

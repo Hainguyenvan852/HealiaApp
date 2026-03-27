@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healio_app/core/utils/snackbar_helper.dart';
-import 'package:healio_app/features/home/presentation/bloc/e_store_bloc.dart';
+import 'package:healio_app/features/explore/presentation/blocs/e_store_bloc.dart';
+import 'package:healio_app/features/explore/presentation/blocs/search_cubit.dart';
 import 'package:healio_app/router/router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -82,6 +83,9 @@ class _AppState extends State<App> {
         ),
         BlocProvider(
           create: (context) => inj<EStoreBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => inj<SearchFilterCubit>(),
         )
       ],
       child: MaterialApp.router(

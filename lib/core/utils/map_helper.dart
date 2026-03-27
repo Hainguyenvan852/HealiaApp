@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:healio_app/features/home/data/models/store_model.dart';
+import 'package:healio_app/features/explore/data/models/store_model.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -232,7 +232,7 @@ class MapHelper {
       mapController?.animateCamera(
           CameraUpdate.newLatLngZoom(
               LatLng(lastPosition.latitude, lastPosition.longitude),
-              12.0
+              11
           ),
           duration: const Duration(milliseconds: 800)
       );
@@ -246,16 +246,16 @@ class MapHelper {
         CameraUpdate.newCameraPosition(
             CameraPosition(
                 target: LatLng(realPosition.latitude, realPosition.longitude),
-                zoom: 12
+                zoom: 11
             )
         ));
   }
 
-  static void flyToPosition(MapLibreMapController? mapController, double latitude, double longitude) async {
+  static void flyToPosition(MapLibreMapController? mapController, double latitude, double longitude, double zoom) async {
     mapController?.animateCamera(
         CameraUpdate.newLatLngZoom(
             LatLng(latitude, longitude),
-            12.0
+            zoom
         ),
         duration: const Duration(milliseconds: 800)
     );

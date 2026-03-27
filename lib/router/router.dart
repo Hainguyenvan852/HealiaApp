@@ -176,9 +176,10 @@ class AppRouter{
                             path: 'time-search',
                             parentNavigatorKey: rootNavigatorKey,
                             pageBuilder: (BuildContext context, GoRouterState state) {
+                              final data = state.extra as Map<String, dynamic>;
                               return CustomTransitionPage<void>(
                                 key: state.pageKey,
-                                child: const TimeSearchPage(),
+                                child: TimeSearchPage(date: data['date'], startTime: data['startTime'], endTime: data['endTime'], timeText: data['timeText'], dateText: data['dateText'],),
                                 transitionDuration: const Duration(milliseconds: 180),
                                 transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child,) {
                                   return FadeTransition(

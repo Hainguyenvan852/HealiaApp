@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:healio_app/features/home/data/models/store_model.dart';
+import 'package:healio_app/features/explore/data/models/store_model.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 

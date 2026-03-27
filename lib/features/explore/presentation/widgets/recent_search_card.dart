@@ -3,16 +3,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class RecentSearchCard extends StatelessWidget {
-  const RecentSearchCard({super.key, required this.category, required this.location, required this.time});
+  const RecentSearchCard({super.key, required this.category, required this.location, required this.time, this.onTap, required this.date});
   final String category;
   final String location;
+  final String date;
   final String time;
-
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){},
+      onTap: onTap,
       child: Row(
         spacing: 15,
         children: [
@@ -59,6 +60,19 @@ class RecentSearchCard extends StatelessWidget {
                         color: Colors.black45
                     ),
                   ),
+                  Icon(
+                    Icons.fiber_manual_record,
+                    size: 4,
+                    color: Colors.black45,
+                  ),
+                  Text(
+                    date,
+                    style: GoogleFonts.quicksand(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Colors.black45
+                    ),
+                  )
                 ],
               )
             ],

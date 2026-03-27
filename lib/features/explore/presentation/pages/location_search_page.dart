@@ -1,10 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gotrue/gotrue.dart';
+import 'package:healio_app/core/services/recently_search_service.dart';
 import 'package:healio_app/features/auth/domain/usecases/check_user_session_usecase.dart';
+import 'package:healio_app/features/explore/presentation/blocs/search_cubit.dart';
+import 'package:healio_app/features/explore/presentation/blocs/search_state.dart';
 import 'package:healio_app/features/explore/presentation/widgets/location_search_card.dart';
 import 'package:healio_app/features/explore/presentation/widgets/recent_location_card.dart';
 import 'package:healio_app/features/widgets/section_header.dart';
@@ -26,6 +30,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
 
   final _searchController = TextEditingController();
   late final Session? session;
+  Future<List<Map<String, dynamic>>> recentLocations = RecentlySearchService.getRecentLocations();
 
   @override
   void initState() {
@@ -62,7 +67,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     }
   }
 
-  Widget _buildListView() {
+  Widget _buildListView(SearchFilterState state) {
     return ListView.separated(
       itemCount: places.length < 5 ? places.length : 5,
       shrinkWrap: true,
@@ -89,16 +94,16 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             coordinate['structured_formatting']['main_text'],
             softWrap: true,
             style: GoogleFonts.quicksand(
-              color: Colors.black,
-              fontWeight: FontWeight.w600
+                color: Colors.black,
+                fontWeight: FontWeight.w600
             ),
           ),
           subtitle: Text(
             coordinate['structured_formatting']['secondary_text'],
             softWrap: true,
             style: GoogleFonts.quicksand(
-              color: Colors.black.withValues(alpha: 0.3),
-              fontWeight: FontWeight.w600
+                color: Colors.black.withValues(alpha: 0.3),
+                fontWeight: FontWeight.w600
             ),
           ),
           onTap: () async {
@@ -113,7 +118,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               final jsonResponse = jsonDecode(response.body);
 
               details = jsonResponse['result'];
-              _searchController.text = coordinate['description'];
+              _searchController.text = details['name'];
             } catch (e) {
               SnackBarHelper.showError(e.toString());
             } finally {
@@ -123,7 +128,8 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                 isLoading = false;
               });
 
-              context.pop(details);
+              context.read<SearchFilterCubit>().updateSearch(state.copyWith(location: details['name'], lng: details['geometry']['location']['lng'],lat: details['geometry']['location']['lat'], address: coordinate['structured_formatting']['secondary_text']));
+              context.pop();
             }
           },
         );
@@ -156,90 +162,153 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
       ),
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20,),
-              SearchTextField1(
-                controller: _searchController,
-                prefixIcon: isLoading
-                    ? SizedBox(
+        child: BlocBuilder<SearchFilterCubit, SearchFilterState>(
+          builder: (context, state){
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20,),
+                  SearchTextField1(
+                    controller: _searchController,
+                    prefixIcon: isLoading
+                        ? SizedBox(
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2.5,)
                     )
-                    : PhosphorIcon(PhosphorIcons.mapPin(), size: 21,),
-                isReadOnly: false,
-                isAutoFocus: true,
-                suffixIcon: Icon(Icons.cancel_outlined, size: 20,),
-                onChanged: (value) {
-                  if(value.isNotEmpty){
-                    fetchData(value);
-                  }
-                },
-              ),
-              const SizedBox(height: 30,),
-          
-              isShow == false
-              ? Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      LocationSearchCard(
-                        onTap: () => context.pop('Current location'),
-                        iconData: PhosphorIcons.navigationArrow(PhosphorIconsStyle.fill),
-                        title: 'Current location',
-                        iconColor: Colors.deepPurpleAccent,
-                        backgroundColor: Colors.deepPurple.withValues(alpha: 0.12 ),
-                      ),
+                        : PhosphorIcon(PhosphorIcons.mapPin(), size: 21,),
+                    isReadOnly: false,
+                    isAutoFocus: true,
+                    suffixIcon: Icon(Icons.cancel_outlined, size: 20,),
+                    onChanged: (value) {
+                      if(value.isNotEmpty){
+                        fetchData(value);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 30,),
 
-                      if(session != null)
-                        Column(
-                          children: [
-                            const SizedBox(height: 30,),
-                            SectionHeader(title: 'My addresses', titleButton: 'Manage'),
-                            const SizedBox(height: 20,),
-                            LocationSearchCard(
-                              onTap: (){},
-                              iconData: PhosphorIcons.house(PhosphorIconsStyle.fill),
-                              title: 'Add home',
-                              iconColor: Colors.black54,
-                              backgroundColor: Colors.grey.withValues(alpha: 0.15),
-                            ),
-                            const SizedBox(height: 20,),
-                            LocationSearchCard(
-                              onTap: (){},
-                              iconData: PhosphorIcons.house(PhosphorIconsStyle.fill),
-                              title: 'Add work',
-                              iconColor: Colors.black54,
-                              backgroundColor: Colors.grey.withValues(alpha: 0.15),
-                            ),
-                          ],
-                        ),
+                  isShow == false
+                  ? Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          LocationSearchCard(
+                            onTap: () {
+                              if(state.locationName != 'Current location'){
+                                context.read<SearchFilterCubit>().updateSearch(
+                                  state.update(
+                                    location: 'Current location',
+                                    category: state.category,
+                                    timeText: state.timeText,
+                                    dateText: state.dateText,
+                                    date: state.date,
+                                    startTime: state.startTime,
+                                    endTime:  state.endTime,
+                                    lng: null,
+                                    lat: null,
+                                    address: null
+                                  )
+                                );
+                              }
+                              context.pop();
+                            },
+                            iconData: PhosphorIcons.navigationArrow(PhosphorIconsStyle.fill),
+                            title: 'Current location',
+                            iconColor: Colors.deepPurpleAccent,
+                            backgroundColor: Colors.deepPurple.withValues(alpha: 0.12 ),
+                          ),
 
-                      if(session != null)
-                        Column(
-                          children: [
-                          const SizedBox(height: 30,),
-                          SectionHeader(title: 'Recent', titleButton: 'Clear'),
-                          const SizedBox(height: 20,),
-                          RecentLocationCard(mainText: 'Haiphong', secondText: 'Haiphong, Hai Phong, Vietnam', onTap: () {},),
-                          const SizedBox(height: 20,),
-                          RecentLocationCard(mainText: 'Hai Ba Trung', secondText: 'Hai Ba Trung, Ha Noi, Vietnam', onTap: () {},),
+                          if(session != null)
+                            Column(
+                              children: [
+                                const SizedBox(height: 30,),
+                                SectionHeader(title: 'My addresses', titleButton: 'Manage'),
+                                const SizedBox(height: 20,),
+                                LocationSearchCard(
+                                  onTap: (){},
+                                  iconData: PhosphorIcons.house(PhosphorIconsStyle.fill),
+                                  title: 'Add home',
+                                  iconColor: Colors.black54,
+                                  backgroundColor: Colors.grey.withValues(alpha: 0.15),
+                                ),
+                                const SizedBox(height: 20,),
+                                LocationSearchCard(
+                                  onTap: (){},
+                                  iconData: PhosphorIcons.house(PhosphorIconsStyle.fill),
+                                  title: 'Add work',
+                                  iconColor: Colors.black54,
+                                  backgroundColor: Colors.grey.withValues(alpha: 0.15),
+                                ),
+                              ],
+                            ),
+
+                          FutureBuilder(
+                              future: recentLocations,
+                              builder: (context, snap){
+                                if(snap.connectionState == ConnectionState.waiting){
+                                  return SizedBox.shrink();
+                                }
+
+                                if(!snap.hasData){
+                                  return SizedBox.shrink();
+                                } else{
+                                  final locations = snap.data;
+                                  if(locations!.isEmpty){
+                                    return SizedBox.shrink();
+                                  } else{
+                                    return Column(
+                                      children: [
+                                        const SizedBox(height: 30,),
+                                        SectionHeader(
+                                          title: 'Recent',
+                                          titleButton: 'Clear',
+                                          onPressed: () {
+                                            RecentlySearchService.clearRecentLocations();
+                                            setState(() {
+                                              recentLocations = RecentlySearchService.getRecentLocations();
+                                            });
+                                          },
+                                        ),
+                                        const SizedBox(height: 20,),
+                                        ListView.separated(
+                                          itemBuilder: (context, index){
+                                            return RecentLocationCard(
+                                              mainText: locations[index]['name'],
+                                              secondText: locations[index]['address'],
+                                              onTap: () {
+                                                context.read<SearchFilterCubit>().updateSearch(state.copyWith(location: locations[index]['name'], lng: locations[index]['lng'], lat: locations[index]['lat'], address: locations[index]['address']));
+                                                context.pop();
+                                              },
+                                            );
+                                          },
+                                          separatorBuilder: (BuildContext context, int index) {
+                                            return const SizedBox(height: 20,);
+                                          },
+                                          itemCount: locations.length,
+                                          shrinkWrap: true,
+                                        )
+                                      ],
+                                    );
+                                  }
+                                }
+                              }
+                          )
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              )
-              : Expanded(child: _buildListView()),
-            ],
-          ),
+                    ),
+                  )
+                  : Expanded(child: _buildListView(state)),
+                ],
+              ),
+            );
+          }
         ),
       ),
     );
   }
 }
+

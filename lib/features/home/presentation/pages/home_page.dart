@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:healio_app/core/utils/snackbar_helper.dart';
 import 'package:healio_app/features/home/presentation/bloc/store_bloc.dart';
 import 'package:healio_app/features/explore/presentation/widgets/explore_grid.dart';
@@ -57,7 +58,7 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 50,),
-                      const HomeHeader(),
+                      HomeHeader(onTap: () => context.go('/explore')),
 
                       if(state.recentlyStores.isNotEmpty)
                         const SizedBox(height: 40,),

@@ -18,16 +18,24 @@ import 'package:healio_app/features/auth/domain/usecases/sign_up_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/update_password_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/verify_user_account.dart';
 import 'package:healio_app/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:healio_app/features/home/data/datasources/store_datasource.dart';
-import 'package:healio_app/features/home/data/irepositories/istore_repository.dart';
-import 'package:healio_app/features/home/domain/repositories/store_repository.dart';
-import 'package:healio_app/features/home/domain/usecases/load_newly_store_usecase.dart';
-import 'package:healio_app/features/home/domain/usecases/load_recently_store_usecase.dart';
-import 'package:healio_app/features/home/domain/usecases/load_recommend_store_usecase.dart';
-import 'package:healio_app/features/home/domain/usecases/load_store_with_distance_usecase.dart';
-import 'package:healio_app/features/home/domain/usecases/load_store_with_id_usecase.dart';
-import 'package:healio_app/features/home/domain/usecases/load_trending_store_usecase.dart';
-import 'package:healio_app/features/home/presentation/bloc/e_store_bloc.dart';
+import 'package:healio_app/features/explore/data/datasources/store_datasource.dart';
+import 'package:healio_app/features/explore/data/irepositories/istore_repository.dart';
+import 'package:healio_app/features/explore/domain/repositories/store_repository.dart';
+import 'package:healio_app/features/explore/domain/usecases/load_newly_store_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/load_recently_store_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/load_recommend_store_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/load_store_with_distance_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/load_store_with_id_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/load_trending_store_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/search_by_all_filter_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/search_by_category_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/search_by_date_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/search_by_datetime_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/search_by_filter_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/search_by_time_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/search_store_around_location_usecase.dart';
+import 'package:healio_app/features/explore/presentation/blocs/e_store_bloc.dart';
+import 'package:healio_app/features/explore/presentation/blocs/search_cubit.dart';
 import 'package:healio_app/features/home/presentation/bloc/store_bloc.dart';
 import 'package:healio_app/router/router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -75,6 +83,14 @@ Future<void> initDependencies() async{
   inj.registerLazySingleton<LoadStoreWithIdUseCase>(() => LoadStoreWithIdUseCase(inj<StoreRepository>()));
   inj.registerLazySingleton<LoadStoreWithDistanceUseCase>(() => LoadStoreWithDistanceUseCase(inj<StoreRepository>()));
   inj.registerLazySingleton<LoadRecommendStoreUseCase>(() => LoadRecommendStoreUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<SearchByAllFilterUseCase>(() => SearchByAllFilterUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<SearchByFilterUseCase>(() => SearchByFilterUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<SearchByCategoryUseCase>(() => SearchByCategoryUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<SearchByDateTimeUseCase>(() => SearchByDateTimeUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<SearchByDateUseCase>(() => SearchByDateUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<SearchByTimeUseCase>(() => SearchByTimeUseCase(inj<StoreRepository>()));
+  inj.registerLazySingleton<SearchStoreAroundLocationUseCase>(() => SearchStoreAroundLocationUseCase(inj<StoreRepository>()));
+
 
   //Blocs
   inj.registerLazySingleton<AuthBloc>(
@@ -108,8 +124,18 @@ Future<void> initDependencies() async{
 
   inj.registerLazySingleton<EStoreBloc>(
       () => EStoreBloc(
-        loadStoreWithDistanceUseCase: inj<LoadStoreWithDistanceUseCase>()
+        loadStoreWithDistanceUseCase: inj<LoadStoreWithDistanceUseCase>(),
+        searchByAllFilterUseCase: inj<SearchByAllFilterUseCase>(),
+        searchByCategoryUseCase: inj<SearchByCategoryUseCase>(),
+        searchByFilterUseCase: inj<SearchByFilterUseCase>(),
+        searchByDateTimeUseCase: inj<SearchByDateTimeUseCase>(),
+        searchByDateUseCase: inj<SearchByDateUseCase>(),
+        searchByTimeUseCase: inj<SearchByTimeUseCase>(),
+        searchStoreAroundLocationUseCase: inj<SearchStoreAroundLocationUseCase>(),
       )
   );
 
+  inj.registerLazySingleton<SearchFilterCubit>(
+      () => SearchFilterCubit()
+  );
 }

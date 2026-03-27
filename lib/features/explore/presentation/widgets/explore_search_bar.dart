@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ExploreSearchBar extends StatelessWidget {
-  const ExploreSearchBar({super.key, required this.onOpen, required this.onSearchPressed,});
+  const ExploreSearchBar({super.key, required this.onOpen, required this.onSearchPressed, required this.category, required this.location, required this.datetime,});
+  final String category;
+  final String location;
+  final String datetime;
   final VoidCallback onOpen;
   final VoidCallback onSearchPressed;
 
@@ -36,15 +39,47 @@ class ExploreSearchBar extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('All treatments', style: TextStyle(
-                          fontSize: 15,
+                      Text(
+                        category,
+                        style: TextStyle(
+                          fontSize: 13,
                           fontWeight: FontWeight.bold
-                      ),),
-                      Text('Current location', style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold
-                      ),)
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          if(datetime.isNotEmpty)
+                            Text(
+                              datetime,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                          if(datetime.isNotEmpty)
+                            const SizedBox(width: 5,),
+                          if(datetime.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5.0),
+                              child: Icon(
+                                Icons.fiber_manual_record,
+                                size: 5,
+                                color: Colors.black,
+                              ),
+                            ),
+                          if(datetime.isNotEmpty)
+                            const SizedBox(width: 5,),
+                          Text(
+                            location,
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),

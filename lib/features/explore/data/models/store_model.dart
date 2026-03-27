@@ -1,4 +1,4 @@
-import 'package:healio_app/features/home/domain/entities/store_entity.dart';
+import 'package:healio_app/features/explore/domain/entities/store_entity.dart';
 
 class StoreModel extends StoreEntity{
   StoreModel({

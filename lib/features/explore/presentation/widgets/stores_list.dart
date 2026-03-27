@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healio_app/features/home/data/models/store_model.dart';
+import 'package:healio_app/features/explore/data/models/store_model.dart';
 import 'package:healio_app/features/explore/presentation/widgets/store_card_2.dart';
 
 class StoresList extends StatelessWidget {
@@ -17,7 +17,7 @@ class StoresList extends StatelessWidget {
             SliverToBoxAdapter(
               child: Center(
                   child: Text(
-                    '24 venues nearby',
+                    '${stores.length} venues nearby',
                     style: TextStyle(
                         color: Colors.grey.shade600,
                         fontWeight: FontWeight.bold
