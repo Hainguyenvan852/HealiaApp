@@ -9,6 +9,9 @@ import 'package:healio_app/core/services/recently_search_service.dart';
 import 'package:healio_app/features/auth/domain/usecases/check_user_session_usecase.dart';
 import 'package:healio_app/features/explore/presentation/blocs/search_cubit.dart';
 import 'package:healio_app/features/explore/presentation/blocs/search_state.dart';
+import 'package:healio_app/features/explore/presentation/blocs/user_address_bloc.dart';
+import 'package:healio_app/features/explore/presentation/pages/add_my_address_page.dart';
+import 'package:healio_app/features/explore/presentation/pages/my_address_page.dart';
 import 'package:healio_app/features/explore/presentation/widgets/location_search_card.dart';
 import 'package:healio_app/features/explore/presentation/widgets/recent_location_card.dart';
 import 'package:healio_app/features/widgets/section_header.dart';
@@ -219,31 +222,123 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                             iconData: PhosphorIcons.navigationArrow(PhosphorIconsStyle.fill),
                             title: 'Current location',
                             iconColor: Colors.deepPurpleAccent,
-                            backgroundColor: Colors.deepPurple.withValues(alpha: 0.12 ),
+                            backgroundColor: Colors.deepPurple.withValues(alpha: 0.12),
                           ),
 
                           if(session != null)
-                            Column(
-                              children: [
-                                const SizedBox(height: 30,),
-                                SectionHeader(title: 'My addresses', titleButton: 'Manage'),
-                                const SizedBox(height: 20,),
-                                LocationSearchCard(
-                                  onTap: (){},
-                                  iconData: PhosphorIcons.house(PhosphorIconsStyle.fill),
-                                  title: 'Add home',
-                                  iconColor: Colors.black54,
-                                  backgroundColor: Colors.grey.withValues(alpha: 0.15),
-                                ),
-                                const SizedBox(height: 20,),
-                                LocationSearchCard(
-                                  onTap: (){},
-                                  iconData: PhosphorIcons.house(PhosphorIconsStyle.fill),
-                                  title: 'Add work',
-                                  iconColor: Colors.black54,
-                                  backgroundColor: Colors.grey.withValues(alpha: 0.15),
-                                ),
-                              ],
+                            BlocBuilder<UserAddressBloc, UserAddressState>(
+                              // listenWhen: (previous, current) => previous != current,
+                              // listener: (BuildContext context, state) {
+                              //   if(state.error != null){
+                              //     SnackBarHelper.showError(state.error.toString());
+                              //   }
+                              // },
+                              builder: (context, addressState){
+                                if(addressState.isLoading){
+                                  return SizedBox.shrink();
+                                }
+
+                                return Column(
+                                  children: [
+                                    const SizedBox(height: 30,),
+                                    SectionHeader(
+                                      title: 'My addresses',
+                                      titleButton: 'Manage',
+                                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => BlocProvider.value(value: context.read<UserAddressBloc>(), child: MyAddressPage(),))),
+                                    ),
+
+                                    const SizedBox(height: 20,),
+                                    addressState.homeAddress != null
+                                    ? LocationSearchCard(
+                                      onTap: (){
+                                        if(state.locationName.toLowerCase() != 'home'){
+                                          context.read<SearchFilterCubit>().updateSearch(
+                                            state.update(
+                                              location: 'Home',
+                                              category: state.category,
+                                              timeText: state.timeText,
+                                              dateText: state.dateText,
+                                              date: state.date,
+                                              startTime: state.startTime,
+                                              endTime:  state.endTime,
+                                              lng: addressState.homeAddress!.lng,
+                                              lat: addressState.homeAddress!.lat,
+                                              address: addressState.homeAddress!.name
+                                            )
+                                          );
+                                        }
+                                        context.pop();
+                                      },
+                                      iconData: PhosphorIcons.house(PhosphorIconsStyle.fill),
+                                      title: 'Home',
+                                      iconColor: Colors.deepPurpleAccent,
+                                      backgroundColor: Colors.deepPurpleAccent.withValues(alpha: 0.15),
+                                    )
+                                    : LocationSearchCard(
+                                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => BlocProvider.value(value: context.read<UserAddressBloc>(), child: AddMyAddressPage(addressName: 'Home'),))),
+                                      iconData: PhosphorIcons.house(PhosphorIconsStyle.fill),
+                                      title: 'Add home',
+                                      iconColor: Colors.black54,
+                                      backgroundColor: Colors.grey.withValues(alpha: 0.15),
+                                    ),
+
+                                    const SizedBox(height: 15,),
+                                    addressState.workAddress != null
+                                    ? LocationSearchCard(
+                                      onTap: (){
+                                        if(state.locationName.toLowerCase() != 'work'){
+                                          context.read<SearchFilterCubit>().updateSearch(
+                                            state.update(
+                                              location: 'Work',
+                                              category: state.category,
+                                              timeText: state.timeText,
+                                              dateText: state.dateText,
+                                              date: state.date,
+                                              startTime: state.startTime,
+                                              endTime:  state.endTime,
+                                              lng: addressState.workAddress!.lng,
+                                              lat: addressState.workAddress!.lat,
+                                              address: addressState.workAddress!.name
+                                            )
+                                          );
+                                        }
+                                        context.pop();
+                                      },
+                                      iconData: PhosphorIcons.briefcase(PhosphorIconsStyle.fill),
+                                      title: 'Work',
+                                      iconColor: Colors.deepPurpleAccent,
+                                      backgroundColor: Colors.deepPurpleAccent.withValues(alpha: 0.15),
+                                    )
+                                    : LocationSearchCard(
+                                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => BlocProvider.value(value: context.read<UserAddressBloc>(), child: AddMyAddressPage(addressName: 'Work'),))),
+                                      iconData: PhosphorIcons.briefcase(PhosphorIconsStyle.fill),
+                                      title: 'Add work',
+                                      iconColor: Colors.black54,
+                                      backgroundColor: Colors.grey.withValues(alpha: 0.15),
+                                    ),
+
+                                    const SizedBox(height: 15,),
+                                    if(addressState.anotherAddress.isNotEmpty)
+                                      Expanded(
+                                          child: ListView.separated(
+                                            itemCount: addressState.anotherAddress.length,
+                                            itemBuilder: (context, index){
+                                              return LocationSearchCard(
+                                                onTap: (){},
+                                                iconData: PhosphorIcons.briefcase(PhosphorIconsStyle.fill),
+                                                title: addressState.anotherAddress[index].name,
+                                                iconColor: Colors.deepPurpleAccent,
+                                                backgroundColor: Colors.deepPurpleAccent.withValues(alpha: 0.15),
+                                              );
+                                            },
+                                            separatorBuilder: (context, index){
+                                              return const SizedBox(height: 15,);
+                                            },
+                                          )
+                                      )
+                                  ],
+                                );
+                              },
                             ),
 
                           FutureBuilder(

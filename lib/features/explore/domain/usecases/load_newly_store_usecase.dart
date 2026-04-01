@@ -6,7 +6,7 @@ class LoadNewlyStoreUseCase {
 
   LoadNewlyStoreUseCase(this._storeRepository);
 
-  Future<List<StoreModel>> call(double userLat, double userLng, double radiusKm) async{
+  Future<List<StoreModel>> call(double userLat, double userLng, double radiusKm) {
     return _storeRepository.getNewlyStore(userLat, userLng, radiusKm);
   }
 }

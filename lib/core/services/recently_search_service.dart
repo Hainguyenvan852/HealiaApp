@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RecentlySearchService {
@@ -55,7 +56,7 @@ class RecentlySearchService {
       'timeText' : timeText,
       'startTime' : startTime != null ? '${startTime.hour.toString()}:${startTime.minute.toString()}' : null,
       'endTime' : endTime != null ? '${endTime.hour.toString()}:${endTime.minute.toString()}' : null,
-      'date' : date,
+      'date' : date != null ? DateFormat('yyyy-MM-dd').format(date) : null,
       'lat' : lat,
       'lng' : lng,
       'address' : address,

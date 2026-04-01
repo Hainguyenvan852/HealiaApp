@@ -75,4 +75,8 @@ class IAuthRepository implements AuthRepository{
     return _authDatasource.getUserInfo(userId);
   }
 
+  @override
+  User? checkCurrentUser() {
+    return _authDatasource.checkCurrentUser();
+  }
 }

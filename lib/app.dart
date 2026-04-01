@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:healio_app/core/utils/snackbar_helper.dart';
 import 'package:healio_app/features/explore/presentation/blocs/e_store_bloc.dart';
 import 'package:healio_app/features/explore/presentation/blocs/search_cubit.dart';
+import 'package:healio_app/features/explore/presentation/blocs/user_address_bloc.dart';
 import 'package:healio_app/router/router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -34,6 +35,7 @@ class _AppState extends State<App> {
 
     _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data){
       AuthChangeEvent event = data.event;
+      final session = data.session;
 
       if(event == AuthChangeEvent.passwordRecovery){
         _appRouter.route.go('/reset-password');
@@ -41,8 +43,11 @@ class _AppState extends State<App> {
       else if(event == AuthChangeEvent.signedIn){
         inj<AuthBloc>().add(AuthChecked());
 
-        Future.delayed(const Duration(milliseconds: 400), (){
+        if (session?.user != null) {
+          inj<UserAddressBloc>().add(GetUserAddress(userId: session!.user.id));
+        }
 
+        Future.delayed(const Duration(milliseconds: 400), (){
           final router = _appRouter.route;
           final currentPath = router.routerDelegate.currentConfiguration.uri.toString();
 
@@ -58,6 +63,8 @@ class _AppState extends State<App> {
         });
       }
       else if(event == AuthChangeEvent.signedOut){
+        inj<UserAddressBloc>().add(ClearUserAddress());
+
         Future.delayed(Duration(milliseconds: 300), (){
           _appRouter.route.go('/home');
         });
@@ -86,6 +93,9 @@ class _AppState extends State<App> {
         ),
         BlocProvider(
           create: (context) => inj<SearchFilterCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => inj<UserAddressBloc>(),
         )
       ],
       child: MaterialApp.router(

@@ -39,7 +39,7 @@ class _ExplorePageState extends State<ExplorePage> {
   final double _distanceThreshold = 10000.0;
   LatLng? _lastSearchedLocation;
   LatLng? _currentCameraTarget;
-  bool isClear = false;
+  bool isProgrammaticMove = false; // Cờ đánh dấu tránh việc load 2 lần khi chọn clear
 
   @override
   void initState() {
@@ -239,6 +239,7 @@ class _ExplorePageState extends State<ExplorePage> {
               mapController!.clearSymbols();
               await MapHelper.addStoreMarkers(mapController, state.aroundStores);
               MapHelper.flyToMe(mapController);
+              isProgrammaticMove = true;
             }
             else if (!state.isSearching) {
               mapController?.clearSymbols();
@@ -252,6 +253,7 @@ class _ExplorePageState extends State<ExplorePage> {
               } else if (state.searchStores == null) {
                 await MapHelper.addStoreMarkers(mapController, state.aroundStores);
                 MapHelper.flyToMe(mapController);
+                isProgrammaticMove = true;
               }
             }
           },
@@ -281,6 +283,12 @@ class _ExplorePageState extends State<ExplorePage> {
                       onCameraIdle: () async{
                         if (mapController == null || _lastSearchedLocation == null || _currentCameraTarget == null) return;
 
+                        if (isProgrammaticMove) {
+                          isProgrammaticMove = false;
+                          _lastSearchedLocation = _currentCameraTarget;
+                          return;
+                        }
+
                         final currentTarget = _currentCameraTarget!;
 
                         double distanceInMeters = Geolocator.distanceBetween(
@@ -290,7 +298,7 @@ class _ExplorePageState extends State<ExplorePage> {
                           currentTarget.longitude,
                         );
 
-                        if (distanceInMeters > _distanceThreshold && !isClear) {
+                        if (distanceInMeters > _distanceThreshold) {
                           _lastSearchedLocation = currentTarget;
                           context.read<SearchFilterCubit>().updateSearch(searchState.copyWith(lat: currentTarget.latitude, lng: currentTarget.longitude, location: 'Map area'));
 

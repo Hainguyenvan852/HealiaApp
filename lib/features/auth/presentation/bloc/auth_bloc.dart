@@ -15,7 +15,7 @@ import '../../../../core/validators/supabase_auth_exception_handler.dart';
 import '../../domain/usecases/check_email_exist_usecase.dart';
 import '../../domain/usecases/check_user_session_usecase.dart';
 import '../../domain/usecases/get_user_email_usecase.dart';
-import '../../domain/usecases/resend_verification_token.dart';
+import '../../domain/usecases/resend_verification_token_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
 import '../../domain/usecases/sign_out_usecase.dart';

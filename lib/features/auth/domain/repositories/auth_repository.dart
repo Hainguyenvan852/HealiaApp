@@ -15,4 +15,5 @@ abstract class AuthRepository {
   String? getCurrentUserEmail();
   Session? checkUserSession();
   Future<UserModel> getUserInfo(String userId);
+  User? checkCurrentUser();
 }

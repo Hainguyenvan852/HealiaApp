@@ -226,4 +226,12 @@ class AuthDataSource {
 
     return UserModel.fromJson(jsonResult);
   }
+
+  User? checkCurrentUser() {
+    try {
+      return _supabase.auth.currentUser;
+    } catch (e) {
+      throw Exception({e.toString()});
+    }
+  }
 }

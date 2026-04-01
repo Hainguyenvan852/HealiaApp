@@ -42,7 +42,7 @@ class ExploreSearchBar extends StatelessWidget {
                       Text(
                         category,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold
                         ),
                       ),
@@ -52,7 +52,7 @@ class ExploreSearchBar extends StatelessWidget {
                             Text(
                               datetime,
                               style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 14,
                                   color: Colors.black54,
                                   fontWeight: FontWeight.bold
                               ),
@@ -60,20 +60,17 @@ class ExploreSearchBar extends StatelessWidget {
                           if(datetime.isNotEmpty)
                             const SizedBox(width: 5,),
                           if(datetime.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5.0),
-                              child: Icon(
-                                Icons.fiber_manual_record,
-                                size: 5,
-                                color: Colors.black,
-                              ),
+                            Icon(
+                              Icons.fiber_manual_record,
+                              size: 5,
+                              color: Colors.black,
                             ),
                           if(datetime.isNotEmpty)
                             const SizedBox(width: 5,),
                           Text(
                             location,
                             style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 14,
                                 color: Colors.black54,
                                 fontWeight: FontWeight.bold
                             ),

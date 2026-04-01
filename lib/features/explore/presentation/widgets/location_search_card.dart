@@ -14,26 +14,29 @@ class LocationSearchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Row(
-        spacing: 15,
-        children: [
-          Container(
-            height: 40,
-            width: 40,
-            child: PhosphorIcon(iconData, size: 21, color: iconColor,),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              shape: BoxShape.circle,
+      child: Container(
+        color: Colors.transparent,
+        child: Row(
+          spacing: 15,
+          children: [
+            Container(
+              height: 40,
+              width: 40,
+              child: PhosphorIcon(iconData, size: 21, color: iconColor,),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                shape: BoxShape.circle,
+              ),
             ),
-          ),
-          Text(
-            title,
-            style: GoogleFonts.quicksand(
-                fontWeight: FontWeight.w600,
-                fontSize: 17
-            ),
-          )
-        ],
+            Text(
+              title,
+              style: GoogleFonts.quicksand(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 17
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

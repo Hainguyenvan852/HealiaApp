@@ -26,7 +26,7 @@ class EStoreState {
     return EStoreState(
         aroundStores: aroundStores ?? this.aroundStores,
         isLoading: isLoading ?? this.isLoading,
-        error: error ?? this.error,
+        error: error,
         searchStores: searchStores,
         isSearching: isSearching ?? this.isSearching
     );

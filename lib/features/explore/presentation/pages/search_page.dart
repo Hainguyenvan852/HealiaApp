@@ -62,7 +62,7 @@ class _SearchPageState extends State<SearchPage> {
     if(state.category != 'All treatments' || state.dateText.toLowerCase() != 'any date' || state.timeText.toLowerCase() != 'anytime' || state.locationName.toLowerCase() != 'current location'){
       await RecentlySearchService.addRecentSearch(state.locationName, state.lat, state.lng, state.date, state.startTime, state.endTime, state.category, state.dateText, state.timeText);
     }
-    if(state.locationName != 'Current location' && state.address != null && state.lng != null && state.lat != null){
+    if(state.locationName != 'Current location' && state.locationName.toLowerCase() != 'work' && state.locationName.toLowerCase() != 'home' && state.address != null && state.lng != null && state.lat != null){
       await RecentlySearchService.addRecentLocation(state.locationName, state.address!, state.lat!, state.lng!);
     }
     context.pop('search');
@@ -191,7 +191,7 @@ class _SearchPageState extends State<SearchPage> {
                                                     location: searchList[index]['address'],
                                                     timeText: searchList[index]['timeText'],
                                                     dateText: searchList[index]['dateText'],
-                                                    date: searchList[index]['date'],
+                                                    date: searchList[index]['date'] != null ? DateTime.parse(searchList[index]['date']) : null,
                                                     startTime: TimeOfDay(hour: int.parse(startParts[0]), minute: int.parse(startParts[1])),
                                                     endTime: TimeOfDay(hour: int.parse(endParts[0]), minute: int.parse(endParts[1])),
                                                     lat: searchList[index]['lat'],

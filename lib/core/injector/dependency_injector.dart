@@ -4,13 +4,14 @@ import 'package:get_it/get_it.dart';
 import 'package:healio_app/features/auth/data/datasource/auth_datasource.dart';
 import 'package:healio_app/features/auth/data/irepositories/iauth_repository.dart';
 import 'package:healio_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:healio_app/features/auth/domain/usecases/check_current_user_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/check_email_exist_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/check_user_session_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/facebook_sign_in_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/get_user_email_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/get_user_info_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/google_sign_in_usecase.dart';
-import 'package:healio_app/features/auth/domain/usecases/resend_verification_token.dart';
+import 'package:healio_app/features/auth/domain/usecases/resend_verification_token_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/sign_out_usecase.dart';
@@ -19,8 +20,14 @@ import 'package:healio_app/features/auth/domain/usecases/update_password_usecase
 import 'package:healio_app/features/auth/domain/usecases/verify_user_account.dart';
 import 'package:healio_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:healio_app/features/explore/data/datasources/store_datasource.dart';
-import 'package:healio_app/features/explore/data/irepositories/istore_repository.dart';
+import 'package:healio_app/features/explore/data/datasources/user_address_datasource.dart';
+import 'package:healio_app/features/explore/data/irepositories/i_store_repository.dart';
+import 'package:healio_app/features/explore/data/irepositories/i_user_address_repository.dart';
 import 'package:healio_app/features/explore/domain/repositories/store_repository.dart';
+import 'package:healio_app/features/explore/domain/repositories/user_address_repository.dart';
+import 'package:healio_app/features/explore/domain/usecases/add_user_address_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/delete_user_address_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/get_user_address_usecase.dart';
 import 'package:healio_app/features/explore/domain/usecases/load_newly_store_usecase.dart';
 import 'package:healio_app/features/explore/domain/usecases/load_recently_store_usecase.dart';
 import 'package:healio_app/features/explore/domain/usecases/load_recommend_store_usecase.dart';
@@ -34,8 +41,10 @@ import 'package:healio_app/features/explore/domain/usecases/search_by_datetime_u
 import 'package:healio_app/features/explore/domain/usecases/search_by_filter_usecase.dart';
 import 'package:healio_app/features/explore/domain/usecases/search_by_time_usecase.dart';
 import 'package:healio_app/features/explore/domain/usecases/search_store_around_location_usecase.dart';
+import 'package:healio_app/features/explore/domain/usecases/update_user_address_usecase.dart';
 import 'package:healio_app/features/explore/presentation/blocs/e_store_bloc.dart';
 import 'package:healio_app/features/explore/presentation/blocs/search_cubit.dart';
+import 'package:healio_app/features/explore/presentation/blocs/user_address_bloc.dart';
 import 'package:healio_app/features/home/presentation/bloc/store_bloc.dart';
 import 'package:healio_app/router/router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -57,14 +66,17 @@ Future<void> initDependencies() async{
   //Datasource
   inj.registerLazySingleton<AuthDataSource>(() => AuthDataSource(supabase));
   inj.registerLazySingleton<StoreDatasource>(() => StoreDatasource(supabase));
+  inj.registerLazySingleton<UserAddressDatasource>(() => UserAddressDatasource(supabase));
 
   //Repositories
   inj.registerLazySingleton<AuthRepository>(() => IAuthRepository(inj<AuthDataSource>()));
   inj.registerLazySingleton<StoreRepository>(() => IStoreRepository(inj<StoreDatasource>()));
+  inj.registerLazySingleton<UserAddressRepository>(() => IUserAddressRepository(inj<UserAddressDatasource>()));
 
   //Use Cases
   inj.registerLazySingleton<CheckEmailExistUseCase>(() => CheckEmailExistUseCase(inj<AuthRepository>()));
   inj.registerLazySingleton<CheckUserSessionUseCase>(() => CheckUserSessionUseCase(inj<AuthRepository>()));
+  inj.registerLazySingleton<CheckCurrentUserUseCase>(() => CheckCurrentUserUseCase(inj<AuthRepository>()));
   inj.registerLazySingleton<FacebookSignInUseCase>(() => FacebookSignInUseCase(inj<AuthRepository>()));
   inj.registerLazySingleton<GetUserEmailUseCase>(() => GetUserEmailUseCase(inj<AuthRepository>()));
   inj.registerLazySingleton<GoogleSignInUseCase>(() => GoogleSignInUseCase(inj<AuthRepository>()));
@@ -91,6 +103,10 @@ Future<void> initDependencies() async{
   inj.registerLazySingleton<SearchByTimeUseCase>(() => SearchByTimeUseCase(inj<StoreRepository>()));
   inj.registerLazySingleton<SearchStoreAroundLocationUseCase>(() => SearchStoreAroundLocationUseCase(inj<StoreRepository>()));
 
+  inj.registerLazySingleton<GetUserAddressUseCase>(() => GetUserAddressUseCase(inj<UserAddressRepository>()));
+  inj.registerLazySingleton<AddUserAddressUseCase>(() => AddUserAddressUseCase(inj<UserAddressRepository>()));
+  inj.registerLazySingleton<DeleteUserAddressUseCase>(() => DeleteUserAddressUseCase(inj<UserAddressRepository>()));
+  inj.registerLazySingleton<UpdateUserAddressUseCase>(() => UpdateUserAddressUseCase(inj<UserAddressRepository>()));
 
   //Blocs
   inj.registerLazySingleton<AuthBloc>(
@@ -137,5 +153,15 @@ Future<void> initDependencies() async{
 
   inj.registerLazySingleton<SearchFilterCubit>(
       () => SearchFilterCubit()
+  );
+
+  inj.registerLazySingleton<UserAddressBloc>(
+     () => UserAddressBloc(
+        getUserAddressUseCase: inj<GetUserAddressUseCase>(),
+        addAddressUseCase: inj<AddUserAddressUseCase>(),
+        checkCurrentUserUseCase: inj<CheckCurrentUserUseCase>(),
+        deleteUserAddressUseCase: inj<DeleteUserAddressUseCase>(),
+        updateUserAddressUseCase: inj<UpdateUserAddressUseCase>(),
+     )
   );
 }

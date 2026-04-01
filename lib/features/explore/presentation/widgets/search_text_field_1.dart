@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SearchTextField1 extends StatefulWidget {
-  const SearchTextField1({super.key, required this.controller, required this.prefixIcon, this.onTap, required this.isReadOnly, required this.isAutoFocus, this.suffixIcon, this.onChanged,});
+  const SearchTextField1({super.key, required this.controller, required this.prefixIcon, this.onTap, required this.isReadOnly, required this.isAutoFocus, this.suffixIcon, this.onChanged, this.isNext,});
   final TextEditingController controller;
   final bool isReadOnly;
   final bool isAutoFocus;
   final Widget prefixIcon;
   final Widget? suffixIcon;
+  final bool? isNext;
   final void Function(String value)? onChanged;
   final void Function()? onTap;
 
@@ -47,6 +48,9 @@ class _SearchTextField1State extends State<SearchTextField1> {
         style: const TextStyle(
           fontWeight: FontWeight.bold
         ),
+        textInputAction: widget.isNext != null
+            ? (widget.isNext! ? TextInputAction.next : TextInputAction.done)
+            : null,
         cursorColor: Colors.black,
         focusNode: _focusNode,
         onTapOutside: (event){
