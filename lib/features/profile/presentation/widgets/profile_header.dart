@@ -20,55 +20,55 @@ class ProfileHeader extends StatelessWidget {
             Text(
               state.user.fullName,
               style: GoogleFonts.quicksand(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 25
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
               ),
             ),
-            Text(
-              'Personal account',
-              style: TextStyle(
-                  fontSize: 15
-              ),
-            ),
+            Text('Personal account', style: TextStyle(fontSize: 15)),
           ],
         ),
         state.user.avatarUrl != null
             ? ClipRRect(
-          borderRadius: BorderRadius.circular(50),
-          child: CachedNetworkImage(
-            width: 60,
-            height: 60,
-            imageUrl: state.user.avatarUrl!,
-            fit: BoxFit.cover,
-            placeholder: (context, url){
-              return Shimmer(
+                borderRadius: BorderRadius.circular(50),
+                child: CachedNetworkImage(
+                  width: 60,
+                  height: 60,
+                  imageUrl: state.user.avatarUrl!,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) {
+                    return Shimmer(
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    );
+                  },
+                  errorWidget: (context, url, error) {
+                    return Center(
+                      child: Icon(Icons.error, color: Colors.white),
+                    );
+                  },
+                ),
+              )
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(50),
                 child: Container(
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    'assets/images/user-avatar-default.png',
+                    fit: BoxFit.cover,
                   ),
                 ),
-              );
-            },
-            errorWidget: (context, url, error){
-              return Center(child: Icon(Icons.error, color: Colors.white,));
-            },
-          ),
-        )
-            : ClipRRect(
-          borderRadius: BorderRadius.circular(50),
-          child: Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle
               ),
-              child: Image.asset('assets/images/user-avatar-default.png', fit: BoxFit.cover,)
-          ),
-        )
       ],
     );
   }
