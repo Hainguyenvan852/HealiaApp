@@ -566,7 +566,7 @@ class _TimeSearchPageState extends State<TimeSearchPage> {
                                               ? 'From'
                                               : 'From ' + DateTimeHelper
                                               .transformTime24To12(
-                                              _selectedCustomTimeStart!.hour),
+                                              _selectedCustomTimeStart!.hour, 0),
                                           style: GoogleFonts.quicksand(
                                               color: _selectedCustomTimeStart ==
                                                   null ? Colors.grey : Colors
@@ -624,7 +624,7 @@ class _TimeSearchPageState extends State<TimeSearchPage> {
                                               ? 'To'
                                               : 'To ' + DateTimeHelper
                                               .transformTime24To12(
-                                              _selectedCustomTimeEnd!.hour),
+                                              _selectedCustomTimeEnd!.hour, 0),
                                           style: GoogleFonts.quicksand(
                                               color: _selectedCustomTimeEnd ==
                                                   null ? Colors.grey : Colors
@@ -732,7 +732,7 @@ class _TimeSearchPageState extends State<TimeSearchPage> {
         items: times.map(
                 (time) => PopupMenuItem(
               value: TimeOfDay(hour: time, minute: 0),
-              child: Text(DateTimeHelper.transformTime24To12(time)),
+              child: Text(DateTimeHelper.transformTime24To12(time, 0)),
             )
         ).toList()
     );

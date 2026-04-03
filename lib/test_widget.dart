@@ -1,20 +1,27 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healio_app/core/utils/date_time_helper.dart';
 import 'package:healio_app/core/utils/snackbar_helper.dart';
 import 'package:healio_app/features/explore/data/models/store_model.dart';
 import 'package:healio_app/features/home/data/models/category_model.dart';
 import 'package:healio_app/features/home/data/models/review_model.dart';
 import 'package:healio_app/features/home/data/models/service_model.dart';
+import 'package:healio_app/features/home/data/models/store_working_hour_model.dart';
 import 'package:healio_app/features/home/presentation/widgets/category_tabbar_view.dart';
 import 'package:healio_app/features/home/presentation/widgets/image_slide.dart';
 import 'package:healio_app/features/home/presentation/widgets/rating_line.dart';
+import 'package:healio_app/features/home/presentation/widgets/store_card_1.dart';
+import 'package:healio_app/features/home/presentation/widgets/store_horizontal_list.dart';
 import 'package:lottie/lottie.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: '.env');
   const uiStyle = SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     systemNavigationBarColor: Colors.transparent,
@@ -77,8 +84,8 @@ class _MyAppState extends State<MyApp> {
               rating: 4.5,
               distance: 5.3,
               primaryCategory: 'Spa',
-              longitude: 1,
-              latitude: 1,
+              longitude: 105.79552386382404,
+              latitude: 21.01015465538361,
             ),
           );
         },
@@ -159,6 +166,65 @@ class _StoreDetailPageState extends State<StoreDetailPage>
       ],
     ),
     CategoryModel(id: 2, name: 'Body', description: '', storeId: 1),
+  ];
+
+  final openingTimes = [
+    StoreWorkingHourModel(
+      id: 0,
+      dayOfWeek: 2,
+      startTime: TimeOfDay(hour: 9, minute: 0),
+      endTime: TimeOfDay(hour: 21, minute: 0),
+      isDayOff: false,
+      storeId: 1,
+    ),
+    StoreWorkingHourModel(
+      id: 1,
+      dayOfWeek: 3,
+      startTime: TimeOfDay(hour: 9, minute: 0),
+      endTime: TimeOfDay(hour: 21, minute: 0),
+      isDayOff: false,
+      storeId: 1,
+    ),
+    StoreWorkingHourModel(
+      id: 2,
+      dayOfWeek: 4,
+      startTime: TimeOfDay(hour: 9, minute: 0),
+      endTime: TimeOfDay(hour: 21, minute: 0),
+      isDayOff: false,
+      storeId: 1,
+    ),
+    StoreWorkingHourModel(
+      id: 3,
+      dayOfWeek: 5,
+      startTime: TimeOfDay(hour: 9, minute: 0),
+      endTime: TimeOfDay(hour: 21, minute: 0),
+      isDayOff: false,
+      storeId: 1,
+    ),
+    StoreWorkingHourModel(
+      id: 4,
+      dayOfWeek: 6,
+      startTime: TimeOfDay(hour: 9, minute: 0),
+      endTime: TimeOfDay(hour: 21, minute: 0),
+      isDayOff: false,
+      storeId: 1,
+    ),
+    StoreWorkingHourModel(
+      id: 5,
+      dayOfWeek: 7,
+      startTime: TimeOfDay(hour: 9, minute: 0),
+      endTime: TimeOfDay(hour: 21, minute: 0),
+      isDayOff: false,
+      storeId: 1,
+    ),
+    StoreWorkingHourModel(
+      id: 6,
+      dayOfWeek: 8,
+      startTime: TimeOfDay(hour: 9, minute: 0),
+      endTime: TimeOfDay(hour: 21, minute: 0),
+      isDayOff: true,
+      storeId: 1,
+    ),
   ];
 
   @override
@@ -304,9 +370,34 @@ class _StoreDetailPageState extends State<StoreDetailPage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildStoreHeader(store: widget.store),
-                  _buildCategoryList(categories: categories),
-                  _buildReviewList(reviews: [], store: widget.store),
-                  _buildStoreIntro(store: widget.store),
+                  BuildCategoryList(categories: categories),
+                  BuildReviewList(reviews: [], store: widget.store),
+                  BuildStoreIntro(store: widget.store),
+                  const SizedBox(height: 30),
+                  BuildOpenTime(times: openingTimes),
+                  const SizedBox(height: 30),
+                  BuildAddInformation(store: widget.store),
+                  const SizedBox(height: 50),
+                  Text(
+                    'Other locations',
+                    style: GoogleFonts.quicksand(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  StoreHorizontalList(stores: [widget.store, widget.store]),
+                  const SizedBox(height: 30),
+                  Text(
+                    'Venues nearby',
+                    style: GoogleFonts.quicksand(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  StoreHorizontalList(stores: [widget.store, widget.store]),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -396,16 +487,16 @@ Widget _buildStoreHeader({required StoreModel store}) {
   );
 }
 
-class _buildCategoryList extends StatefulWidget {
-  const _buildCategoryList({required this.categories});
+class BuildCategoryList extends StatefulWidget {
+  const BuildCategoryList({super.key, required this.categories});
 
   final List<CategoryModel> categories;
 
   @override
-  State<_buildCategoryList> createState() => __buildCategoryListState();
+  State<BuildCategoryList> createState() => _BuildCategoryListState();
 }
 
-class __buildCategoryListState extends State<_buildCategoryList>
+class _BuildCategoryListState extends State<BuildCategoryList>
     with TickerProviderStateMixin {
   late final TabController _tabController;
 
@@ -429,7 +520,7 @@ class __buildCategoryListState extends State<_buildCategoryList>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 40),
+        const SizedBox(height: 30),
         Text(
           'Services',
           style: GoogleFonts.quicksand(
@@ -479,6 +570,7 @@ class __buildCategoryListState extends State<_buildCategoryList>
               )
               .toList(),
         ),
+        const SizedBox(height: 30),
         CategoryTabBarView(
           services: widget.categories[_tabController.index].services,
         ),
@@ -508,17 +600,21 @@ class __buildCategoryListState extends State<_buildCategoryList>
   }
 }
 
-class _buildReviewList extends StatefulWidget {
-  const _buildReviewList({required this.reviews, required this.store});
+class BuildReviewList extends StatefulWidget {
+  const BuildReviewList({
+    super.key,
+    required this.reviews,
+    required this.store,
+  });
 
   final List<ReviewModel> reviews;
   final StoreModel store;
 
   @override
-  State<_buildReviewList> createState() => __buildReviewListState();
+  State<BuildReviewList> createState() => _BuildReviewListState();
 }
 
-class __buildReviewListState extends State<_buildReviewList> {
+class _BuildReviewListState extends State<BuildReviewList> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -546,6 +642,7 @@ class __buildReviewListState extends State<_buildReviewList> {
         const SizedBox(height: 20),
         Divider(height: 1, color: Colors.black.withValues(alpha: 0.15)),
         ListView.separated(
+          padding: EdgeInsets.only(top: 10),
           physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemCount: 2,
@@ -650,16 +747,15 @@ class __buildReviewListState extends State<_buildReviewList> {
   }
 }
 
-class _buildStoreIntro extends StatefulWidget {
-  const _buildStoreIntro({required this.store});
+class BuildStoreIntro extends StatefulWidget {
+  const BuildStoreIntro({super.key, required this.store});
   final StoreModel store;
 
   @override
-  State<_buildStoreIntro> createState() => __buildStoreIntroState();
+  State<BuildStoreIntro> createState() => _BuildStoreIntroState();
 }
 
-class __buildStoreIntroState extends State<_buildStoreIntro> {
-
+class _BuildStoreIntroState extends State<BuildStoreIntro> {
   bool isReadMore = false;
 
   @override
@@ -667,7 +763,7 @@ class __buildStoreIntroState extends State<_buildStoreIntro> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 50),
+        const SizedBox(height: 30),
         Text(
           'About',
           style: GoogleFonts.quicksand(
@@ -675,47 +771,326 @@ class __buildStoreIntroState extends State<_buildStoreIntro> {
             fontSize: 22,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         !isReadMore
-        ? Text(
-          '\"${widget.store.introduction}\"',
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
+            ? Text(
+                '\"${widget.store.introduction}\"',
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.quicksand(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 17,
+                  color: Colors.black,
+                ),
+              )
+            : Text(
+                '\"${widget.store.introduction}\"',
+                textAlign: TextAlign.justify,
+                style: GoogleFonts.quicksand(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 17,
+                  color: Colors.black,
+                ),
+              ),
+        !isReadMore
+            ? GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isReadMore = true;
+                  });
+                },
+                child: Text(
+                  'Read more',
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.quicksand(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                ),
+              )
+            : SizedBox.shrink(),
+      ],
+    );
+  }
+}
+
+class BuildOpenTime extends StatelessWidget {
+  const BuildOpenTime({super.key, required this.times});
+  final List<StoreWorkingHourModel> times;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Opening times',
           style: GoogleFonts.quicksand(
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
-            color: Colors.black,
-          ),
-        )
-        : Text(
-          '\"${widget.store.introduction}\"',
-          textAlign: TextAlign.justify,
-          style: GoogleFonts.quicksand(
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
-            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
           ),
         ),
-        !isReadMore 
-        ? GestureDetector(
-          onTap: () {
-            setState(() {
-              isReadMore = true;
-            });
+        ListView.separated(
+          padding: EdgeInsets.only(top: 10),
+          shrinkWrap: true,
+          itemCount: times.length,
+          physics: NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  spacing: 10,
+                  children: [
+                    Icon(
+                      Icons.fiber_manual_record,
+                      size: 18,
+                      color: times[index].isDayOff
+                          ? Colors.black.withValues(alpha: 0.15)
+                          : const Color.fromARGB(255, 93, 214, 97),
+                    ),
+                    Text(
+                      DateTimeHelper.intToDayOfWeek(times[index].dayOfWeek),
+                      style: GoogleFonts.quicksand(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  DateTimeHelper.transformTime24To12(
+                        times[index].startTime.hour,
+                        times[index].startTime.minute,
+                      ) +
+                      ' - ' +
+                      DateTimeHelper.transformTime24To12(
+                        times[index].endTime.hour,
+                        times[index].endTime.minute,
+                      ),
+                  style: GoogleFonts.quicksand(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            );
           },
+          separatorBuilder: (context, index) {
+            return const SizedBox(height: 15);
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class BuildAddInformation extends StatelessWidget {
+  const BuildAddInformation({super.key, required this.store});
+  final StoreModel store;
+
+  @override
+  Widget build(BuildContext context) {
+    final tileKey = dotenv.env['GOONG_MAP_TILE_KEY'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Additional information',
+          style: GoogleFonts.quicksand(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          spacing: 10,
+          children: [
+            Icon(Icons.check_rounded, size: 20),
+            Text(
+              'Instant confirmation',
+              style: GoogleFonts.quicksand(
+                fontWeight: FontWeight.w600,
+                fontSize: 17,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: SizedBox(
+            height: 230, // Chiều cao của Card
+            width: double.infinity,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                IgnorePointer(
+                  child: MapLibreMap(
+                    styleString:
+                        "https://tiles.goong.io/assets/goong_map_web.json?api_key=$tileKey",
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(store.latitude, store.longitude),
+                      zoom: 13.0,
+                    ),
+                    compassEnabled: false,
+                    zoomGesturesEnabled: false,
+                    scrollGesturesEnabled: false,
+                    rotateGesturesEnabled: false,
+                    tiltGesturesEnabled: false,
+                  ),
+                ),
+
+                CustomPaint(
+                  size: const Size(40, 50),
+                  painter: RatingMarkerPainter(
+                    rating: store.rating.toStringAsFixed(1),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          store.address,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: GoogleFonts.quicksand(
+            fontWeight: FontWeight.w600,
+            fontSize: 17,
+          ),
+        ),
+        GestureDetector(
+          onTap: () {},
           child: Text(
-            'Read more',
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
+            'Get directions',
             style: GoogleFonts.quicksand(
-              fontWeight: FontWeight.w500,
-              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              fontSize: 17,
               color: Colors.deepPurpleAccent,
             ),
           ),
-        )
-        : SizedBox.shrink(), 
+        ),
       ],
     );
+  }
+}
+
+class RatingMarkerPainter extends CustomPainter {
+  final String rating;
+
+  RatingMarkerPainter({required this.rating});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // 1. CẤU HÌNH KÍCH THƯỚC
+    const double width = 80 / 2;
+    const double height = 50 / 2;
+    const double tailHeight = 15 / 2;
+    const double tailWidth = 18 / 2;
+    const double cornerRadius = 25.0 / 2;
+
+    const double shadowBlur = 8.0 / 2;
+    const double shadowOffset = 5.0 / 2;
+
+    // Dịch bút vẽ vào trong để chừa lề cho bóng đổ
+    canvas.translate(shadowBlur, shadowBlur);
+
+    // 2. KHỞI TẠO BÚT VẼ (Đã đổi thành nền Đen)
+    final Paint mainPaint = Paint()..color = Colors.black;
+
+    // Bút vẽ bóng đổ
+    final Paint shadowPaint = Paint()
+      ..color = Colors.black.withOpacity(0.4)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, shadowBlur);
+
+    // 3. VẼ ĐƯỜNG BAO (PATH)
+    final Path path = Path();
+    path.moveTo(cornerRadius, 0);
+    path.lineTo(width - cornerRadius, 0);
+    path.arcToPoint(
+      const Offset(width, cornerRadius),
+      radius: const Radius.circular(cornerRadius),
+    );
+    path.lineTo(width, height - cornerRadius);
+    path.arcToPoint(
+      const Offset(width - cornerRadius, height),
+      radius: const Radius.circular(cornerRadius),
+    );
+    path.lineTo(width / 2 + tailWidth / 2, height);
+    path.lineTo(width / 2, height + tailHeight); // Mũi nhọn đuôi
+    path.lineTo(width / 2 - tailWidth / 2, height);
+    path.lineTo(cornerRadius, height);
+    path.arcToPoint(
+      const Offset(0, height - cornerRadius),
+      radius: const Radius.circular(cornerRadius),
+    );
+    path.lineTo(0, cornerRadius);
+    path.arcToPoint(
+      const Offset(cornerRadius, 0),
+      radius: const Radius.circular(cornerRadius),
+    );
+    path.close();
+
+    // 4. THỰC HIỆN VẼ
+    canvas.drawPath(path.shift(const Offset(0, shadowOffset)), shadowPaint);
+    canvas.drawPath(path, mainPaint);
+
+    // 5. VẼ CHỮ (Đã đổi thành chữ Trắng)
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(
+        text: rating,
+        style: const TextStyle(
+          color: Colors.white, // Chữ màu trắng
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+
+    textPainter.layout();
+
+    // Căn giữa chữ
+    final double textX = (width - textPainter.width) / 2;
+    final double textY = (height - textPainter.height) / 2;
+
+    textPainter.paint(canvas, Offset(textX, textY));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    // Nếu điểm đánh giá thay đổi thì mới cần vẽ lại
+    if (oldDelegate is RatingMarkerPainter) {
+      return oldDelegate.rating != rating;
+    }
+    return false;
+  }
+}
+
+class StoreHorizontalList extends StatelessWidget {
+  const StoreHorizontalList({super.key, required this.stores});
+  final List<StoreModel> stores;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        height: 250,
+        child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index){
+              return StoreCard1(store: stores[index], onTap: () {
+              },);
+            },
+            separatorBuilder:(context, index){
+              return SizedBox(width: 15,);
+            },
+            itemCount: stores.length
+        ),
+      );
   }
 }

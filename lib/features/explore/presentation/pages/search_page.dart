@@ -130,7 +130,7 @@ class _SearchPageState extends State<SearchPage> {
                           child: SearchTextField2(
                             content: state.timeText.toLowerCase() != 'custom'
                                 ? state.timeText
-                                : DateTimeHelper.transformTime24To12(state.startTime!.hour) + ' - ' + DateTimeHelper.transformTime24To12(state.endTime!.hour),
+                                : DateTimeHelper.transformTime24To12(state.startTime!.hour, 0) + ' - ' + DateTimeHelper.transformTime24To12(state.endTime!.hour, 0),
                             secondContent: state.dateText,
                             iconWidget: PhosphorIcon(
                               PhosphorIcons.calendarBlank(), size: 20,),

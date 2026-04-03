@@ -9,6 +9,7 @@ class CategoryTabBarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      padding: EdgeInsets.only(top: 10),
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: services != null ? services!.length : 0,
