@@ -35,9 +35,6 @@ class StoreBloc extends Bloc<StoreEvent, StoreState>{
     on<LoadingStore>((event, emit) async{
       try{
         emit(state.copyWith(isLoading: true));
-
-        MapHelper.checkPermission();
-
         Position position = await Geolocator.getCurrentPosition();
 
         final recentlyStoreIds = await RecentlyViewedService.getRecentlyViewedIds();
@@ -80,8 +77,6 @@ class StoreBloc extends Bloc<StoreEvent, StoreState>{
     on<AddRecentlyStore>((event, emit) async{
       try{
         RecentlyViewedService.addRecentlyViewed(event.storeId);
-
-        MapHelper.checkPermission();
 
         Position position = await Geolocator.getCurrentPosition();
 

@@ -2,6 +2,12 @@ import 'package:flutter/src/material/time.dart';
 import 'package:healio_app/features/explore/data/datasources/store_datasource.dart';
 import 'package:healio_app/features/explore/data/models/store_model.dart';
 import 'package:healio_app/features/explore/domain/repositories/store_repository.dart';
+import 'package:healio_app/features/home/data/models/category_model.dart';
+import 'package:healio_app/features/home/data/models/favorite_store_model.dart';
+import 'package:healio_app/features/home/data/models/review_model.dart';
+import 'package:healio_app/features/home/data/models/service_model.dart';
+import 'package:healio_app/features/home/data/models/store_working_hour_model.dart';
+import 'package:healio_app/features/home/data/models/team_member_model.dart';
 
 class IStoreRepository extends StoreRepository{
 
@@ -67,5 +73,50 @@ class IStoreRepository extends StoreRepository{
   @override
   Future<List<StoreModel>> searchStoreAroundLocation(double lat, double lng, double radiusKm) {
     return storeDatasource.fetchStoreAroundLocation(lat, lng, radiusKm);
+  }
+
+  @override
+  Future<List<CategoryModel>> getCategoryList(int storeId) {
+    return storeDatasource.fetchCategorys(storeId); 
+  }
+
+  @override
+  Future<List<StoreWorkingHourModel>> getOpeningHourList(int storeId) {
+    return storeDatasource.fetchOpeningHours(storeId);
+  }
+
+  @override
+  Future<List<ReviewModel>> getReviewList(int storeId) {
+    return storeDatasource.fetchReviews(storeId);
+  }
+
+  @override
+  Future<List<ServiceModel>> getServiceList(int categoryId) {
+    return storeDatasource.fetchServices(categoryId);
+  }
+
+  @override
+  Future<void> deleteFavoriteStores(String userId, int storeId) async {
+    storeDatasource.deleteFavoriteStore(userId, storeId);
+  }
+
+  @override
+  Future<List<FavoriteStoreModel>> getFavoriteStores(String userId) {
+    return storeDatasource.fetchFavoriteStores(userId);
+  }
+
+  @override
+  Future<void> insertFavoriteStores(String userId, int storeId) async{
+    storeDatasource.insertFavoriteStore(userId, storeId);
+  }
+  
+  @override
+  Future<FavoriteStoreModel?> getFavoriteStore(String userId, int storeId) {
+    return storeDatasource.fetchFavoriteStore(userId, storeId);
+  }
+
+  @override
+  Future<List<TeamMemberModel>> getTeamMemberByService(int serviceId) {
+    return storeDatasource.fetchTeamMembersByService(serviceId);
   }
 }

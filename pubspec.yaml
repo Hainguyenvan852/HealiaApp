@@ -67,42 +67,10 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/icons/convenience-store.png
-    - assets/icons/google-icon-logo.svg
-    - assets/icons/facebook-logo-icon.svg
-    - assets/icons/email-icon.svg
-    - assets/icons/profile-icon.svg
-    - assets/icons/lock-circle-icon.svg
-    - assets/icons/nail.png
-    - assets/icons/eyelashes.png
-    - assets/icons/massage-bed.png
-    - assets/icons/massage.png
-    - assets/icons/barber-chair.png
-    - assets/icons/lipstick.png
-    - assets/icons/heart-arrow.png
+    - assets/icons/
 
-    - assets/images/logo-healio-app.png
-    - assets/images/logo-healio-app-2.png
-    - assets/images/user-avatar-default.png
-    - assets/images/massage-banner.png
-    - assets/images/hair-salon-banner.jpeg
-    - assets/images/spa-banner.webp
-    - assets/images/medspa-banner.webp
-    - assets/images/nail-banner.jpg
-    - assets/images/barber-banner.jpg
-    - assets/images/aesthetic.png
-    - assets/images/barbering.png
-    - assets/images/body.png
-    - assets/images/hair-and-styling.webp
-    - assets/images/makeup.jpg
-    - assets/images/massage.jpg
-    - assets/images/nail.jpeg
-    - assets/images/spa.png
-    - assets/images/tattoo.png
+    - assets/images/
 
-    - assets\animations\like.json
-    - assets\animations\like2.json
-    - assets\animations\like3.json
-
+    - assets/animations/
 
     - .env

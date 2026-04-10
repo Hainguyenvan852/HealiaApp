@@ -1,22 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:healio_app/core/utils/snackbar_helper.dart';
 import 'package:healio_app/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:healio_app/features/auth/presentation/pages/forgot_password_page.dart';
-import 'package:healio_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:healio_app/features/auth/presentation/widgets/login_header.dart';
 import 'package:healio_app/features/auth/presentation/widgets/login_textfield.dart';
 import 'package:healio_app/features/auth/presentation/widgets/oauth_button.dart';
-import 'package:healio_app/features/appointment/presentation/pages/appointment_page.dart';
-import 'package:healio_app/features/explore/presentation/pages/explore_page.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../../../core/validators/text_field_validation.dart';
-import '../../../landing/splash_screen.dart';
 import '../widgets/auth_text_button.dart';
 
 class LoginPage extends StatefulWidget {

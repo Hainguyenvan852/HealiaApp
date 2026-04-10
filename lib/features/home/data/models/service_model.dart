@@ -16,7 +16,7 @@ class ServiceModel extends ServiceEntity {
     return ServiceModel(
       id: json['id'] as int,
       name: json['name'] as String,
-      description: json['description'] as String,
+      description: json['description'] as String? ?? '',
       duration: json['duration_minutes'] as int,
       price: json['price'] as double,
       priceType: json['price_type'] as String,

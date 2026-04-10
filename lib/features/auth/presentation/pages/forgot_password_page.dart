@@ -55,7 +55,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               }, icon: Icon(Icons.arrow_back_rounded, size: 25, )),
               shape: UnderlineInputBorder(
                   borderSide: BorderSide(
-                      color: Colors.grey.withOpacity(0.3),
+                      color: Colors.grey.withValues(alpha: 0.3),
                       width: 0.5
                   )
               ),
@@ -135,7 +135,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   boxShadow: [
                     BoxShadow(
                         offset: Offset(0, -3),
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         spreadRadius: 1,
                         blurRadius: 5
                     )

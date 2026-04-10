@@ -4,13 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gotrue/gotrue.dart';
 import 'package:healio_app/core/utils/date_time_helper.dart';
-import 'package:healio_app/core/utils/map_helper.dart';
 import 'package:healio_app/features/auth/domain/usecases/check_user_session_usecase.dart';
 import 'package:healio_app/features/explore/presentation/blocs/search_cubit.dart';
 import 'package:healio_app/features/explore/presentation/blocs/search_state.dart';
 import 'package:healio_app/features/explore/presentation/widgets/recent_search_card.dart';
 import 'package:healio_app/features/explore/presentation/widgets/search_text_field_2.dart';
-import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/injector/dependency_injector.dart';

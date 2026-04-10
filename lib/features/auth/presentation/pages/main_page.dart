@@ -45,7 +45,7 @@ class MainPage extends StatelessWidget {
                 child: Container(
                   color: Colors.white,
                     height: 40,
-                    child: Icon(FontAwesomeIcons.home, size: 22, color: (navigationShell.currentIndex == 0) ? Colors.purple : Colors.black,)
+                    child: Icon(FontAwesomeIcons.house, size: 22, color: (navigationShell.currentIndex == 0) ? Colors.purple : Colors.black,)
                 ),
               ),
               GestureDetector(
@@ -53,7 +53,7 @@ class MainPage extends StatelessWidget {
                   child: Container(
                     color: Colors.white,
                       height: 40,
-                    child: Icon(FontAwesomeIcons.search, size: 22, color: (navigationShell.currentIndex == 1) ? Colors.purple : Colors.black,)
+                    child: Icon(FontAwesomeIcons.magnifyingGlass, size: 22, color: (navigationShell.currentIndex == 1) ? Colors.purple : Colors.black,)
                   )
               ),
               GestureDetector(

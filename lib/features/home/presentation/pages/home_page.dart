@@ -19,24 +19,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  // late DateTime _focusedDay;
-  // late DateTime _selectedDay;
-  // late TimeOfDay? _selectedCustomTimeStart;
-  // late TimeOfDay? _selectedCustomTimeEnd;
-
-  // Map<String, String> _selectedTime = {
-  //   'type' : 'anytime'
-  // };
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _focusedDay = DateTime.now();
-  //   _selectedDay = DateTime.now();
-  //   _selectedCustomTimeStart = null;
-  //   _selectedCustomTimeEnd = null;
-  // }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<StoreBloc, StoreState>(

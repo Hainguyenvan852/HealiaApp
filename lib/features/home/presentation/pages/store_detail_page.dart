@@ -1,160 +1,174 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healio_app/core/injector/dependency_injector.dart';
 import 'package:healio_app/core/utils/date_time_helper.dart';
+import 'package:healio_app/core/utils/snackbar_helper.dart';
+import 'package:healio_app/features/auth/domain/usecases/check_current_user_usecase.dart';
 import 'package:healio_app/features/explore/data/models/store_model.dart';
 import 'package:healio_app/features/home/data/models/category_model.dart';
 import 'package:healio_app/features/home/data/models/review_model.dart';
-import 'package:healio_app/features/home/data/models/service_model.dart';
 import 'package:healio_app/features/home/data/models/store_working_hour_model.dart';
+import 'package:healio_app/features/home/presentation/bloc/booking_cubit.dart';
+import 'package:healio_app/features/home/presentation/bloc/store_infomation_cubit.dart';
 import 'package:healio_app/features/home/presentation/widgets/category_tabbar_view.dart';
 import 'package:healio_app/features/home/presentation/widgets/image_slide.dart';
 import 'package:healio_app/features/home/presentation/widgets/rating_line.dart';
 import 'package:healio_app/features/home/presentation/widgets/store_card_1.dart';
+import 'package:healio_app/features/home/presentation/widgets/store_detail_page_shimmer.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:lottie/lottie.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
 class StoreDetailPage extends StatefulWidget {
-  const StoreDetailPage({super.key, required this.store});
-  final StoreModel store;
+  const StoreDetailPage({super.key});
 
   @override
   State<StoreDetailPage> createState() => _StoreDetailPageState();
 }
 
-class _StoreDetailPageState extends State<StoreDetailPage>
+class _StoreDetailPageState extends State<StoreDetailPage> {
+
+  int countTotalSevices(List<CategoryModel> categories){
+    int total = 0;
+    for (var item in categories){
+      total += item.services != null ? item.services!.length : 0;
+    }
+    return total;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<StoreInfomationCubit, StoreInfomationState>(
+      listenWhen: (previous, current) =>
+          previous.runtimeType != current.runtimeType,
+      listener: (context, state) {
+        if (state.error != null) {
+          SnackBarHelper.showError(state.error.toString());
+        }
+      },
+      builder: (context, state) {
+        if (state.isLoading ||
+            state.error != null ||
+            state.currentStore == null) {
+          return StoreDetailPageShimmer();
+        }
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: CustomScrollView(
+            physics: const ScrollPhysics(),
+            slivers: [
+              StoreDetailAppBar(state: state),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildStoreHeader(store: state.currentStore!),
+                      BuildCategoryList(categories: state.categories),
+                      state.reviews.isNotEmpty
+                          ? BuildReviewList(
+                              reviews: state.reviews,
+                              store: state.currentStore!,
+                            )
+                          : SizedBox.shrink(),
+                      BuildStoreIntro(store: state.currentStore!),
+                      const SizedBox(height: 30),
+                      BuildOpenTime(times: state.workingHours),
+                      const SizedBox(height: 30),
+                      BuildAddInformation(store: state.currentStore!),
+                      const SizedBox(height: 50),
+                      Text(
+                        'Venues nearby',
+                        style: GoogleFonts.quicksand(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      StoreHorizontalList(stores: state.nearbyStores),
+                      const SizedBox(height: 100),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          bottomSheet: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide(
+                color: Colors.black.withValues(alpha: 0.15)
+              ))
+            ),
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${countTotalSevices(state.categories)} services available',
+                  style: GoogleFonts.quicksand(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black.withValues(alpha: 0.5)
+                  ),
+                ),
+                FilledButton(
+                  onPressed: () => context.go('/home/store-detail/select-service', extra: state.categories),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size(120, 50),
+                    maximumSize: Size(120, 50)
+                  ),
+                  child: Text(
+                    'Book now',
+                    style: GoogleFonts.quicksand(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class StoreDetailAppBar extends StatefulWidget {
+  const StoreDetailAppBar({super.key, required this.state});
+  final StoreInfomationState state;
+
+  @override
+  State<StoreDetailAppBar> createState() => _StoreDetailAppBarState();
+}
+
+class _StoreDetailAppBarState extends State<StoreDetailAppBar>
     with TickerProviderStateMixin {
-  bool isFavorite = false;
-  bool showLottie = false;
+  late bool showLottie;
   late AnimationController _lottieController;
-
-  final categories = [
-    CategoryModel(
-      id: 0,
-      name: 'Recovery',
-      description: '',
-      storeId: 1,
-      services: [
-        ServiceModel(
-          id: 1,
-          name: 'Tiêm trẻ hóa, đầy sẹo Collagen Linerase 1',
-          description: '',
-          duration: 60,
-          price: 12990000,
-          priceType: 'fix',
-          categoryId: 0,
-          treatmentId: 0,
-        ),
-        ServiceModel(
-          id: 2,
-          name: 'Tiêm trẻ hóa Collagen Linerase 2',
-          description: '',
-          duration: 60,
-          price: 2000000,
-          priceType: 'from',
-          categoryId: 0,
-          treatmentId: 0,
-        ),
-      ],
-    ),
-    CategoryModel(
-      id: 1,
-      name: 'Hair',
-      description: '',
-      storeId: 1,
-      services: [
-        ServiceModel(
-          id: 1,
-          name: 'Dưỡng tóc',
-          description: '',
-          duration: 60,
-          price: 12990000,
-          priceType: 'fix',
-          categoryId: 0,
-          treatmentId: 0,
-        ),
-        ServiceModel(
-          id: 2,
-          name: 'Gội đầu massage',
-          description: '',
-          duration: 90,
-          price: 2000000,
-          priceType: 'from',
-          categoryId: 0,
-          treatmentId: 0,
-        ),
-      ],
-    ),
-    CategoryModel(id: 2, name: 'Body', description: '', storeId: 1),
-  ];
-
-  final openingTimes = [
-    StoreWorkingHourModel(
-      id: 0,
-      dayOfWeek: 2,
-      startTime: TimeOfDay(hour: 9, minute: 0),
-      endTime: TimeOfDay(hour: 21, minute: 0),
-      isDayOff: false,
-      storeId: 1,
-    ),
-    StoreWorkingHourModel(
-      id: 1,
-      dayOfWeek: 3,
-      startTime: TimeOfDay(hour: 9, minute: 0),
-      endTime: TimeOfDay(hour: 21, minute: 0),
-      isDayOff: false,
-      storeId: 1,
-    ),
-    StoreWorkingHourModel(
-      id: 2,
-      dayOfWeek: 4,
-      startTime: TimeOfDay(hour: 9, minute: 0),
-      endTime: TimeOfDay(hour: 21, minute: 0),
-      isDayOff: false,
-      storeId: 1,
-    ),
-    StoreWorkingHourModel(
-      id: 3,
-      dayOfWeek: 5,
-      startTime: TimeOfDay(hour: 9, minute: 0),
-      endTime: TimeOfDay(hour: 21, minute: 0),
-      isDayOff: false,
-      storeId: 1,
-    ),
-    StoreWorkingHourModel(
-      id: 4,
-      dayOfWeek: 6,
-      startTime: TimeOfDay(hour: 9, minute: 0),
-      endTime: TimeOfDay(hour: 21, minute: 0),
-      isDayOff: false,
-      storeId: 1,
-    ),
-    StoreWorkingHourModel(
-      id: 5,
-      dayOfWeek: 7,
-      startTime: TimeOfDay(hour: 9, minute: 0),
-      endTime: TimeOfDay(hour: 21, minute: 0),
-      isDayOff: false,
-      storeId: 1,
-    ),
-    StoreWorkingHourModel(
-      id: 6,
-      dayOfWeek: 8,
-      startTime: TimeOfDay(hour: 9, minute: 0),
-      endTime: TimeOfDay(hour: 21, minute: 0),
-      isDayOff: true,
-      storeId: 1,
-    ),
-  ];
 
   @override
   void initState() {
+    if (widget.state.isFavorite != null) {
+      showLottie = widget.state.isFavorite!;
+    } else {
+      showLottie = false;
+    }
+
     _lottieController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800), // Thời gian chạy animation
+      duration: const Duration(milliseconds: 800),
     );
 
     _lottieController.addStatusListener((status) {
@@ -175,157 +189,124 @@ class _StoreDetailPageState extends State<StoreDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SliverAppBar(
+      expandedHeight: 250,
+      stretch: true,
+      pinned: true,
       backgroundColor: Colors.white,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 320,
-            stretch: true,
-            pinned: true,
-            backgroundColor: Colors.white,
-            leadingWidth: 50,
-            scrolledUnderElevation: 0,
-            leading: GestureDetector(
-              onTap: () {},
-              child: Container(
-                margin: const EdgeInsets.only(left: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: PhosphorIcon(PhosphorIcons.arrowLeft(), size: 22),
-              ),
+      leadingWidth: 50,
+      scrolledUnderElevation: 0,
+      leading: GestureDetector(
+        onTap: () {
+          context.read<StoreInfomationCubit>().clearState();
+          context.read<BookingCubit>().clearState();
+          context.pop();
+        },
+        child: Container(
+          margin: const EdgeInsets.only(left: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: PhosphorIcon(PhosphorIcons.arrowLeft(), size: 22),
+        ),
+      ),
+      actions: [
+        GestureDetector(
+          onTap: () {},
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
             ),
-            actions: [
-              GestureDetector(
-                onTap: () {},
-                child: Container(
-                  padding: const EdgeInsets.all(8),
+            child: PhosphorIcon(PhosphorIcons.shareNetwork(), size: 22),
+          ),
+        ),
+        const SizedBox(width: 5),
+        GestureDetector(
+          onTap: () async {
+            final user = inj<CheckCurrentUserUseCase>().call();
+            if (user != null && widget.state.isFavorite != null) {
+              if (!widget.state.isFavorite!) {
+                context.read<StoreInfomationCubit>().addFavoriteStore(
+                  user.id,
+                  widget.state.currentStore!.id,
+                );
+                setState(() {
+                  showLottie = true;
+                });
+                _lottieController.forward();
+              } else {
+                context.read<StoreInfomationCubit>().removeFavoriteStore(
+                  user.id,
+                  widget.state.currentStore!.id,
+                );
+                _lottieController.reverse();
+              }
+            } else {
+              context.push('/login');
+            }
+          },
+          child: Container(
+            height: 55,
+            width: 55,
+            decoration: BoxDecoration(shape: BoxShape.circle),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  height: 40,
+                  width: 40,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                  child: PhosphorIcon(PhosphorIcons.shareNetwork(), size: 22),
                 ),
-              ),
-              const SizedBox(width: 5),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (!isFavorite) {
-                      isFavorite = true;
-                      showLottie = true;
-                      _lottieController.forward();
-                    } else {
-                      isFavorite = false;
-                      _lottieController.reverse();
-                    }
-                  });
-                },
-                child: Container(
-                  height: 55,
-                  width: 55,
-                  decoration: BoxDecoration(shape: BoxShape.circle),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
+                showLottie
+                    ? SizedBox(
+                        height: 55,
+                        width: 55,
+                        child: Lottie.asset(
+                          'assets/animations/like.json',
+                          controller: _lottieController,
+                          fit: BoxFit.cover,
                         ),
-                      ),
-                      showLottie
-                          ? SizedBox(
-                              height: 55,
-                              width: 55,
-                              child: Lottie.asset(
-                                'assets/animations/like.json',
-                                controller: _lottieController,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : PhosphorIcon(PhosphorIcons.heart(), size: 22),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-            flexibleSpace: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                final top = constraints.biggest.height;
-                final collapsedHeight =
-                    MediaQuery.of(context).padding.top + kToolbarHeight + 50;
-                final isCollapsed = top <= collapsedHeight;
+                      )
+                    : PhosphorIcon(PhosphorIcons.heart(), size: 22),
+              ],
+            ),
+          ),
+        ),
+      ],
+      flexibleSpace: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final top = constraints.biggest.height;
+          final collapsedHeight =
+              MediaQuery.of(context).padding.top + kToolbarHeight + 50;
+          final isCollapsed = top <= collapsedHeight;
 
-                return FlexibleSpaceBar(
-                  centerTitle: true,
-                  title: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
-                    opacity: isCollapsed ? 1.0 : 0.0,
-                    child: SizedBox(
-                      width: 200,
-                      child: Text(
-                        widget.store.name,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.quicksand(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
+          return FlexibleSpaceBar(
+            centerTitle: true,
+            title: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: isCollapsed ? 1.0 : 0.0,
+              child: SizedBox(
+                width: 200,
+                child: Text(
+                  widget.state.currentStore!.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.quicksand(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
                   ),
-                  // Hình ảnh nền sẽ tự động bị ẩn/che đi khi cuộn lên nhờ FlexibleSpaceBar
-                  background: StoreImageSlider(store: widget.store),
-                );
-              },
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildStoreHeader(store: widget.store),
-                  BuildCategoryList(categories: categories),
-                  BuildReviewList(reviews: [], store: widget.store),
-                  BuildStoreIntro(store: widget.store),
-                  const SizedBox(height: 30),
-                  BuildOpenTime(times: openingTimes),
-                  const SizedBox(height: 30),
-                  BuildAddInformation(store: widget.store),
-                  const SizedBox(height: 50),
-                  Text(
-                    'Other locations',
-                    style: GoogleFonts.quicksand(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  StoreHorizontalList(stores: [widget.store, widget.store]),
-                  const SizedBox(height: 30),
-                  Text(
-                    'Venues nearby',
-                    style: GoogleFonts.quicksand(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  StoreHorizontalList(stores: [widget.store, widget.store]),
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+            background: StoreImageSlider(store: widget.state.currentStore!),
+          );
+        },
       ),
     );
   }
@@ -361,7 +342,7 @@ Widget _buildStoreHeader({required StoreModel store}) {
                   ),
                 ),
                 const SizedBox(width: 5),
-                RatingLine(store: store, iconSize: 20),
+                RatingLine(rating: store.rating, iconSize: 20),
                 const SizedBox(width: 5),
                 Text(
                   '(${store.ratingNumber.toString()})',
@@ -377,7 +358,7 @@ Widget _buildStoreHeader({required StoreModel store}) {
       Row(
         children: [
           Text(
-            store.distance.toString() + 'km',
+            store.distance.toStringAsFixed(1) + ' km',
             style: GoogleFonts.quicksand(
               fontWeight: FontWeight.w500,
               fontSize: 16,
@@ -387,24 +368,19 @@ Widget _buildStoreHeader({required StoreModel store}) {
           const SizedBox(width: 5),
           Icon(Icons.fiber_manual_record, size: 5, color: Colors.black45),
           const SizedBox(width: 5),
-          Text(
-            store.address,
-            style: GoogleFonts.quicksand(
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
-              color: Colors.black54,
+          Expanded(
+            child: Text(
+              store.address,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.quicksand(
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+                color: Colors.black54,
+              ),
             ),
           ),
         ],
-      ),
-      const SizedBox(height: 5),
-      Text(
-        'Open until 9:00 PM',
-        style: GoogleFonts.quicksand(
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-          color: Colors.black54,
-        ),
       ),
     ],
   );
@@ -499,7 +475,10 @@ class _BuildCategoryListState extends State<BuildCategoryList>
         ),
         const SizedBox(height: 20),
         OutlinedButton(
-          onPressed: () {},
+          onPressed: () => context.push(
+            '/home/store-detail/select-service',
+            extra: widget.categories,
+          ),
           style: OutlinedButton.styleFrom(
             minimumSize: Size(double.infinity, 50),
             backgroundColor: Colors.white,
@@ -552,7 +531,7 @@ class _BuildReviewListState extends State<BuildReviewList> {
           ),
         ),
         const SizedBox(height: 20),
-        RatingLine(store: widget.store, iconSize: 40),
+        RatingLine(rating: widget.store.rating, iconSize: 40),
         const SizedBox(height: 10),
         Text(
           widget.store.rating.toString() + ' (${widget.store.ratingNumber})',
@@ -568,7 +547,7 @@ class _BuildReviewListState extends State<BuildReviewList> {
           padding: EdgeInsets.only(top: 10),
           physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          itemCount: 2,
+          itemCount: widget.reviews.length,
           itemBuilder: (context, index) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -580,8 +559,7 @@ class _BuildReviewListState extends State<BuildReviewList> {
                       child: CachedNetworkImage(
                         width: 60,
                         height: 60,
-                        imageUrl:
-                            'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small_2x/default-avatar-icon-of-social-media-user-vector.jpg',
+                        imageUrl: widget.reviews[index].avatarUrl ?? 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small_2x/default-avatar-icon-of-social-media-user-vector.jpg',
                         fit: BoxFit.cover,
                         placeholder: (context, url) {
                           return Shimmer(
@@ -607,7 +585,7 @@ class _BuildReviewListState extends State<BuildReviewList> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Lại Thanh H',
+                          widget.reviews[index].customerName,
                           style: GoogleFonts.quicksand(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -615,7 +593,7 @@ class _BuildReviewListState extends State<BuildReviewList> {
                           ),
                         ),
                         Text(
-                          'Mon, Sep 11. 2023 at 9:44 PM',
+                          DateFormat("EEE, MMM dd. yyyy 'at' h:mm a").format(widget.reviews[index].createdAt),
                           style: GoogleFonts.quicksand(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -627,16 +605,18 @@ class _BuildReviewListState extends State<BuildReviewList> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                RatingLine(store: widget.store, iconSize: 20),
-                const SizedBox(height: 10),
-                Text(
-                  'Great',
-                  style: GoogleFonts.quicksand(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                RatingLine(rating: widget.store.rating, iconSize: 20),
+                if(widget.reviews[index].comment != null)
+                  const SizedBox(height: 10),
+                if(widget.reviews[index].comment != null)
+                  Text(
+                    widget.reviews[index].comment!,
+                    style: GoogleFonts.quicksand(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
               ],
             );
           },
@@ -646,7 +626,13 @@ class _BuildReviewListState extends State<BuildReviewList> {
         ),
         SizedBox(height: 20),
         OutlinedButton(
-          onPressed: () {},
+          onPressed: () => context.go(
+            '/home/store-detail/all-reviews',
+            extra: {
+              'all-reviews' : widget.reviews,
+              'store' : widget.store
+            },
+          ),
           style: OutlinedButton.styleFrom(
             minimumSize: Size(double.infinity, 50),
             backgroundColor: Colors.white,
@@ -715,7 +701,7 @@ class _BuildStoreIntroState extends State<BuildStoreIntro> {
                   color: Colors.black,
                 ),
               ),
-        !isReadMore
+        !isReadMore && widget.store.introduction.length > 50
             ? GestureDetector(
                 onTap: () {
                   setState(() {
@@ -928,7 +914,7 @@ class RatingMarkerPainter extends CustomPainter {
 
     // Bút vẽ bóng đổ
     final Paint shadowPaint = Paint()
-      ..color = Colors.black.withOpacity(0.4)
+      ..color = Colors.black.withValues(alpha: 0.4)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, shadowBlur);
 
     // 3. VẼ ĐƯỜNG BAO (PATH)
@@ -965,6 +951,7 @@ class RatingMarkerPainter extends CustomPainter {
 
     // 5. VẼ CHỮ (Đã đổi thành chữ Trắng)
     final TextPainter textPainter = TextPainter(
+      textDirection: TextDirection.ltr,
       text: TextSpan(
         text: rating,
         style: const TextStyle(
@@ -973,7 +960,6 @@ class RatingMarkerPainter extends CustomPainter {
           fontWeight: FontWeight.bold,
         ),
       ),
-      textDirection: TextDirection.ltr,
     );
 
     textPainter.layout();
@@ -1002,18 +988,17 @@ class StoreHorizontalList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: 250,
-        child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index){
-              return StoreCard1(store: stores[index], onTap: () {
-              },);
-            },
-            separatorBuilder:(context, index){
-              return SizedBox(width: 15,);
-            },
-            itemCount: stores.length
-        ),
-      );
+      height: 250,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return StoreCard1(store: stores[index], onTap: () {});
+        },
+        separatorBuilder: (context, index) {
+          return SizedBox(width: 15);
+        },
+        itemCount: 5,
+      ),
+    );
   }
 }

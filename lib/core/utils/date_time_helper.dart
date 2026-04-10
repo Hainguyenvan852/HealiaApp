@@ -129,4 +129,19 @@ class DateTimeHelper {
         return 'Invalid day';
     }
   }
+
+  static String minuteToHourAndMinute(int minuteValue){
+    int hour = (minuteValue/60).floorToDouble().toInt();
+    int minute = minuteValue % 60;
+
+    if(hour > 0){
+      if(minute > 0){
+        return '$hour hr, $minute min';
+      } else{
+        return '$hour hr';
+      }
+    } else{
+      return '$minute min';
+    }
+  }
 }

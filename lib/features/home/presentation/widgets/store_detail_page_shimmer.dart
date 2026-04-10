@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:healio_app/features/home/presentation/bloc/store_infomation_cubit.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
@@ -21,14 +24,20 @@ class StoreDetailPageShimmer extends StatelessWidget {
                   Positioned(
                     top: 60,
                     left: 20,
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.black.withValues(alpha: 0.3))
+                    child: InkWell(
+                      onTap: () {
+                        context.read<StoreInfomationCubit>().clearState();
+                        context.pop();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.black.withValues(alpha: 0.3))
+                        ),
+                        child: PhosphorIcon(PhosphorIcons.arrowLeft(), size: 25,),
                       ),
-                      child: PhosphorIcon(PhosphorIcons.arrowLeft(), size: 25,),
                     ),
                   ),
                   Positioned.fill(

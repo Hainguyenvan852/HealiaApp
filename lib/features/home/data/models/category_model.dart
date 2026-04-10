@@ -13,7 +13,7 @@ class CategoryModel extends CategoryEntity {
     return CategoryModel(
       id: json['id'] as int,
       name: json['name'] as String,
-      description: json['description'] as String,
+      description: json['description'] as String? ?? '',
       storeId: json['store_id'] as int,
     );
   }

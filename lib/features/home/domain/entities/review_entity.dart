@@ -1,11 +1,10 @@
 class ReviewEntity {
-  int id;
+  int id, appointmentId, storeId;
   String customerId;
-  String staffId;
-  String appointmentId;
+  String customerName;
   double rating;
-  String? comment;
+  String? comment, avatarUrl;
   DateTime createdAt;
 
-  ReviewEntity({ required this.id, required this.customerId, required this.staffId, required this.appointmentId, required this.rating, required this.comment, required this.createdAt});
+  ReviewEntity({required this.id, required this.customerId, required this.customerName, required this.appointmentId, required this.rating, required this.comment, required this.createdAt, required this.storeId, this.avatarUrl});
 }

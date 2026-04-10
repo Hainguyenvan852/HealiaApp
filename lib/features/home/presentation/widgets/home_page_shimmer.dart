@@ -34,7 +34,7 @@ class HomePageShimmer extends StatelessWidget {
                                 color: Colors.grey
                             )
                         ),
-                        child: Icon(FontAwesomeIcons.search, color: Colors.black, size: 18,)
+                        child: Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black, size: 18,)
                     )
                   ],
                 ),
@@ -44,7 +44,7 @@ class HomePageShimmer extends StatelessWidget {
                       width: 230,
                       height: 12,
                       decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: Colors.grey.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(25)
                       ),
                     )
@@ -66,7 +66,7 @@ class HomePageShimmer extends StatelessWidget {
                               width: 60,
                               height: 8,
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.2),
+                                  color: Colors.grey.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(25)
                               ),
                             ),
@@ -75,7 +75,7 @@ class HomePageShimmer extends StatelessWidget {
                               width: 180,
                               height: 11,
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.2),
+                                  color: Colors.grey.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(25)
                               ),
                             ),
@@ -84,7 +84,7 @@ class HomePageShimmer extends StatelessWidget {
                               width: 110,
                               height: 8,
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.2),
+                                  color: Colors.grey.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(25)
                               ),
                             ),
@@ -93,7 +93,7 @@ class HomePageShimmer extends StatelessWidget {
                               width: 130,
                               height: 8,
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.2),
+                                  color: Colors.grey.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(25)
                               ),
                             ),
@@ -105,7 +105,7 @@ class HomePageShimmer extends StatelessWidget {
                                   width: 120,
                                   height: 35,
                                   decoration: BoxDecoration(
-                                      color: Colors.grey.withOpacity(0.2),
+                                      color: Colors.grey.withValues(alpha: 0.2),
                                       borderRadius: BorderRadius.circular(25)
                                   ),
                                 ),
@@ -113,7 +113,7 @@ class HomePageShimmer extends StatelessWidget {
                                   width: 55,
                                   height: 35,
                                   decoration: BoxDecoration(
-                                      color: Colors.grey.withOpacity(0.2),
+                                      color: Colors.grey.withValues(alpha: 0.2),
                                       borderRadius: BorderRadius.circular(25)
                                   ),
                                 ),
@@ -131,7 +131,7 @@ class HomePageShimmer extends StatelessWidget {
                       width: 100,
                       height: 12,
                       decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: Colors.grey.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(25)
                       ),
                     )
@@ -155,7 +155,7 @@ class HomePageShimmer extends StatelessWidget {
                                 width: 60,
                                 height: 8,
                                 decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.2),
+                                    color: Colors.grey.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(25)
                                 ),
                               ),
@@ -164,7 +164,7 @@ class HomePageShimmer extends StatelessWidget {
                                 width: 180,
                                 height: 8,
                                 decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.2),
+                                    color: Colors.grey.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(25)
                                 ),
                               ),
@@ -173,7 +173,7 @@ class HomePageShimmer extends StatelessWidget {
                                 width: 110,
                                 height: 8,
                                 decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.2),
+                                    color: Colors.grey.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(25)
                                 ),
                               ),
@@ -182,7 +182,7 @@ class HomePageShimmer extends StatelessWidget {
                                 width: 130,
                                 height: 8,
                                 decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.2),
+                                    color: Colors.grey.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(25)
                                 ),
                               ),
@@ -199,7 +199,7 @@ class HomePageShimmer extends StatelessWidget {
                       width: 80,
                       height: 12,
                       decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: Colors.grey.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(25)
                       ),
                     )
@@ -215,7 +215,7 @@ class HomePageShimmer extends StatelessWidget {
                         width: 250,
                         height: 100,
                         decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(10)
                         ),
                       ),
@@ -223,7 +223,7 @@ class HomePageShimmer extends StatelessWidget {
                       Container(
                         width: 250,
                         decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(10)
                         ),
                       )

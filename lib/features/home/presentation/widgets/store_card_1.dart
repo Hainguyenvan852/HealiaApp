@@ -111,6 +111,6 @@ class StoreCard1 extends StatelessWidget {
           ),
         ],
       ),
-    );;
+    );
   }
 }

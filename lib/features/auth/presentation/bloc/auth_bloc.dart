@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healio_app/features/auth/data/models/user_model.dart';
@@ -7,10 +5,8 @@ import 'package:healio_app/features/auth/domain/usecases/facebook_sign_in_usecas
 import 'package:healio_app/features/auth/domain/usecases/get_user_info_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/google_sign_in_usecase.dart';
 import 'package:healio_app/features/auth/domain/usecases/verify_user_account.dart';
-import 'package:healio_app/router/router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/injector/dependency_injector.dart';
 import '../../../../core/validators/supabase_auth_exception_handler.dart';
 import '../../domain/usecases/check_email_exist_usecase.dart';
 import '../../domain/usecases/check_user_session_usecase.dart';
@@ -100,19 +96,19 @@ class AuthBloc extends Bloc<AuthEvent, OAuthState> {
       }
     });
 
-    on<ResendTokenRequest>((event, emit) async{
+    on<ResendTokenRequest>((event, emit) {
       emit(AuthLoading());
       try{
-        final response = await resendVerificationTokenUseCase.call(event.email);
+        resendVerificationTokenUseCase.call(event.email);
       } catch(e){
         emit(AuthError(errorMsg: SupabaseAuthExceptionHandler.parse(e)));
       }
     });
 
-    on<UserSignedIn>((event, emit) async {
+    on<UserSignedIn>((event, emit) {
       emit(AuthLoading());
       try {
-        final response = await signInUserUseCase.call(event.email, event.password);
+        signInUserUseCase.call(event.email, event.password);
         // final user = await getUserInfoUseCase.call(response.user!.id);
         // emit(AuthSuccess(user));
       } catch (e) {
@@ -141,11 +137,11 @@ class AuthBloc extends Bloc<AuthEvent, OAuthState> {
       }
     });
 
-    on<GoogleSignInRequested>((event, emit) async {
+    on<GoogleSignInRequested>((event, emit) {
       emit(AuthLoading());
 
       try {
-        final response = await signInWithGoogleUseCase.call();
+        signInWithGoogleUseCase.call();
         // final user = await getUserInfoUseCase.call(response.user!.id);
         // emit(AuthSuccess(user));
       } on AuthException catch (e) {

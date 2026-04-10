@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:healio_app/core/utils/map_helper.dart';
 import 'package:healio_app/features/explore/domain/usecases/load_store_with_distance_usecase.dart';
 import 'package:healio_app/features/explore/domain/usecases/search_by_all_filter_usecase.dart';
 import 'package:healio_app/features/explore/domain/usecases/search_by_category_usecase.dart';
@@ -45,7 +44,7 @@ class EStoreBloc extends Bloc<EStoreEvent, EStoreState>{
       try{
         emit(state.copyWith(isLoading: true));
 
-        MapHelper.checkPermission();
+        // MapHelper.checkPermission();
 
         Position position = await Geolocator.getCurrentPosition();
 

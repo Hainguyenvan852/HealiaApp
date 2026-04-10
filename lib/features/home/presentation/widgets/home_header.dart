@@ -27,7 +27,7 @@ class HomeHeader extends StatelessWidget {
                         color: Colors.grey
                     )
                 ),
-                child: Icon(FontAwesomeIcons.search, color: Colors.black, size: 18,)
+                child: Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black, size: 18,)
             ),
           )
         ],

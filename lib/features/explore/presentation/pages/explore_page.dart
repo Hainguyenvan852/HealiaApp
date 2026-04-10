@@ -164,7 +164,9 @@ class _ExplorePageState extends State<ExplorePage> {
           _lastSearchedLocation = LatLng(lastPosition.latitude, lastPosition.longitude);
         } else{
           Position position = await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.high
+              locationSettings: LocationSettings(
+                accuracy: LocationAccuracy.high
+              )
           );
           _lastSearchedLocation = LatLng(position.latitude, position.longitude);
           context.read<SearchFilterCubit>().updateSearch(state.copyWith(lng: position.longitude, lat: position.latitude));
@@ -203,7 +205,7 @@ class _ExplorePageState extends State<ExplorePage> {
               PhosphorIcon(PhosphorIcons.magnifyingGlass(), size: 60, color: Colors.deepPurpleAccent),
               const SizedBox(height: 20),
               Text('We didn\'t find a match', style: GoogleFonts.quicksand(fontWeight: FontWeight.bold, fontSize: 22)),
-              Text('Try a new search', style: GoogleFonts.quicksand(fontWeight: FontWeight.w600, color: Colors.black.withOpacity(0.3), fontSize: 14)),
+              Text('Try a new search', style: GoogleFonts.quicksand(fontWeight: FontWeight.w600, color: Colors.black.withValues(alpha: 0.3), fontSize: 14)),
               const SizedBox(height: 20),
               FilledButton(
                 onPressed:() => _clearSearch(),

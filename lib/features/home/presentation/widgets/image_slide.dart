@@ -48,8 +48,8 @@ class _StoreImageSliderState extends State<StoreImageSlider> {
                 return Shimmer(
                     child: Container(
                       color: Colors.white,
-                      height: 50,
-                      width: 400,
+                      height: 230,
+                      width: double.infinity,
                     )
                 );
               },

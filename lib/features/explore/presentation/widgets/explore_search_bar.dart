@@ -24,7 +24,7 @@ class ExploreSearchBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: GestureDetector(
               onTap: () => onSearchPressed(),
-                child: Icon(FontAwesomeIcons.search, size: 20,)
+                child: Icon(FontAwesomeIcons.magnifyingGlass, size: 20,)
             ),
           ),
           const SizedBox(

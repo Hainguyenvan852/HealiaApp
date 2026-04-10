@@ -19,7 +19,7 @@ class SearchBarShimmer extends StatelessWidget {
         children: [
           IconButton(
             onPressed: (){},
-            icon: Icon(FontAwesomeIcons.search, size: 20,),
+            icon: Icon(FontAwesomeIcons.magnifyingGlass, size: 20,),
           ),
           const SizedBox(
             width: 5,
@@ -34,7 +34,7 @@ class SearchBarShimmer extends StatelessWidget {
                         width: 100,
                         height: 8,
                         decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(25)
                         ),
                       )
@@ -45,7 +45,7 @@ class SearchBarShimmer extends StatelessWidget {
                         width: 120,
                         height: 8,
                         decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(25)
                         ),
                       )
@@ -97,7 +97,7 @@ class _SlidingUpShimmerState extends State<SlidingUpShimmer> {
                   width: 50,
                   height: 5,
                   decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.3),
+                      color: Colors.grey.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(25)
                   ),
                 )
@@ -113,7 +113,7 @@ class _SlidingUpShimmerState extends State<SlidingUpShimmer> {
                       child: Container(
                         width: 60,
                         decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
+                            color: Colors.grey.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(25)
                         ),
                       )
@@ -123,7 +123,7 @@ class _SlidingUpShimmerState extends State<SlidingUpShimmer> {
                       child: Container(
                         width: 140,
                         decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
+                            color: Colors.grey.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(25)
                         ),
                       )
@@ -133,7 +133,7 @@ class _SlidingUpShimmerState extends State<SlidingUpShimmer> {
                       child: Container(
                         width: 110,
                         decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
+                            color: Colors.grey.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(25)
                         ),
                       )
@@ -143,7 +143,7 @@ class _SlidingUpShimmerState extends State<SlidingUpShimmer> {
                       child: Container(
                         width: 100,
                         decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
+                            color: Colors.grey.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(25)
                         ),
                       )
@@ -183,7 +183,7 @@ class StoreListShimmer extends StatelessWidget {
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.3),
+                        color: Colors.grey.withValues(alpha: 0.3),
                         shape: BoxShape.circle
                     ),
                   )
@@ -202,7 +202,7 @@ class StoreListShimmer extends StatelessWidget {
                           width: double.infinity,
                           height: 210,
                           decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.3),
+                              color: Colors.grey.withValues(alpha: 0.3),
                               borderRadius: BorderRadius.circular(10)
                           ),
                         )
@@ -217,7 +217,7 @@ class StoreListShimmer extends StatelessWidget {
                               child: Container(
                                 height: 12,
                                 decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.3),
+                                    color: Colors.grey.withValues(alpha: 0.3),
                                     borderRadius: BorderRadius.circular(10)
                                 ),
                               )
@@ -229,7 +229,7 @@ class StoreListShimmer extends StatelessWidget {
                               child: Container(
                                 height: 8,
                                 decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.3),
+                                    color: Colors.grey.withValues(alpha: 0.3),
                                     borderRadius: BorderRadius.circular(10)
                                 ),
                               )
@@ -246,7 +246,7 @@ class StoreListShimmer extends StatelessWidget {
                               width: 130,
                               height: 8,
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.3),
+                                  color: Colors.grey.withValues(alpha: 0.3),
                                   borderRadius: BorderRadius.circular(10)
                               ),
                             )

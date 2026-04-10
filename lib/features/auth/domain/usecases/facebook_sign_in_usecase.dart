@@ -1,5 +1,3 @@
-import 'package:gotrue/gotrue.dart';
-
 import '../repositories/auth_repository.dart';
 
 class FacebookSignInUseCase {

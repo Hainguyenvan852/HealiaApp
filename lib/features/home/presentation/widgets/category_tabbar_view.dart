@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healio_app/core/utils/currency_formart.dart';
+import 'package:healio_app/core/utils/date_time_helper.dart';
 import 'package:healio_app/features/home/data/models/service_model.dart';
 
 class CategoryTabBarView extends StatelessWidget {
@@ -30,7 +32,7 @@ class CategoryTabBarView extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    services![index].duration.toString(),
+                    DateTimeHelper.minuteToHourAndMinute(services![index].duration),
                     style: GoogleFonts.quicksand(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -42,8 +44,8 @@ class CategoryTabBarView extends StatelessWidget {
                     services![index].priceType != 'fix'
                         ? (services![index].priceType != 'from'
                               ? 'Free'
-                              : 'From ' + services![index].price.toString())
-                        : services![index].price.toString(),
+                              : 'From ' + CurrencyFormart.formatVND(services![index].price))
+                        : CurrencyFormart.formatVND(services![index].price),
                     style: GoogleFonts.quicksand(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
