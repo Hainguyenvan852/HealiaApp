@@ -1,0 +1,704 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:healio_app/core/injector/dependency_injector.dart';
+import 'package:healio_app/features/manager/options/data/datasources/report_datasource.dart';
+import 'package:healio_app/shared/datasource/transaction_datasource.dart';
+import 'package:healio_app/shared/models/transaction_model.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:healio_app/core/utils/snackbar_helper.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import '../../../../../core/utils/color_theme.dart';
+import '../../../../../../l10n/app_localizations.dart';
+
+class TransactionListPage extends StatefulWidget {
+  const TransactionListPage({Key? key}) : super(key: key);
+
+  @override
+  State<TransactionListPage> createState() => _TransactionListPageState();
+}
+
+class _TransactionListPageState extends State<TransactionListPage> {
+  final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
+  String _selectedRangePreset = 'Last 30 days';
+  late DateTime _startDate;
+  late DateTime _endDate;
+
+  List<TransactionModel> _allTransactions = [];
+  List<TransactionModel> _filteredTransactions = [];
+  bool _isLoading = true;
+
+  final List<String> _presets = [
+    'Yesterday',
+    'Last 7 days',
+    'Last 30 days',
+    'Last 3 months',
+    'Last 6 months',
+    'Last year',
+    'Custom',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _applyPreset('Last 30 days');
+    _fetchData();
+  }
+
+  String _getPresetLabel(BuildContext context, String preset) {
+    switch (preset) {
+      case 'Yesterday':
+        return AppLocalizations.of(context)!.yesterday;
+      case 'Last 7 days':
+        return AppLocalizations.of(context)!.last7days;
+      case 'Last 30 days':
+        return AppLocalizations.of(context)!.last30days;
+      case 'Last 3 months':
+        return AppLocalizations.of(context)!.last3months;
+      case 'Last 6 months':
+        return AppLocalizations.of(context)!.last6months;
+      case 'Last year':
+        return AppLocalizations.of(context)!.lastYear;
+      case 'Custom':
+        return AppLocalizations.of(context)!.custom;
+      default:
+        return preset;
+    }
+  }
+
+  void _applyPreset(String preset) {
+    DateTime now = DateTime.now();
+    DateTime start;
+    DateTime end;
+
+    switch (preset) {
+      case 'Yesterday':
+        start = now.subtract(const Duration(days: 1));
+        end = now.subtract(const Duration(days: 1));
+        break;
+      case 'Last 7 days':
+        start = now.subtract(const Duration(days: 7));
+        end = now;
+        break;
+      case 'Last 30 days':
+        start = now.subtract(const Duration(days: 30));
+        end = now;
+        break;
+      case 'Last 3 months':
+        start = DateTime(now.year, now.month - 3, now.day);
+        end = now;
+        break;
+      case 'Last 6 months':
+        start = DateTime(now.year, now.month - 6, now.day);
+        end = now;
+        break;
+      case 'Last year':
+        start = DateTime(now.year - 1, 1, 1);
+        end = DateTime(now.year - 1, 12, 31);
+        break;
+      default:
+        return;
+    }
+
+    setState(() {
+      _selectedRangePreset = preset;
+      _startDate = start;
+      _endDate = end;
+      _filterData();
+    });
+  }
+
+  void _showFilterBottomSheet() {
+    String tempPreset = _selectedRangePreset;
+    DateTime tempStart = _startDate;
+    DateTime tempEnd = _endDate;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 24.0,
+                right: 24.0,
+                top: 24.0,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24.0,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.filter,
+                        style: GoogleFonts.quicksand(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(context)!.dateRange,
+                    style: GoogleFonts.quicksand(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: tempPreset,
+                        style: GoogleFonts.quicksand(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                        items: _presets
+                            .map(
+                              (v) => DropdownMenuItem(
+                                value: v,
+                                child: Text(
+                                  _getPresetLabel(context, v),
+                                  style: GoogleFonts.quicksand(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setModalState(() {
+                              tempPreset = val;
+                              DateTime now = DateTime.now();
+                              if (val == 'Last 30 days') {
+                                tempStart = now.subtract(
+                                  const Duration(days: 30),
+                                );
+                                tempEnd = now;
+                              } else if (val == 'Last 7 days') {
+                                tempStart = now.subtract(
+                                  const Duration(days: 7),
+                                );
+                                tempEnd = now;
+                              } else if (val == 'Yesterday') {
+                                tempStart = now.subtract(
+                                  const Duration(days: 1),
+                                );
+                                tempEnd = now.subtract(const Duration(days: 1));
+                              }
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(context)!.startDate,
+                    style: GoogleFonts.quicksand(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: () async {
+                      final d = await showDatePicker(
+                        context: context,
+                        initialDate: tempStart,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2100),
+                      );
+                      if (d != null) {
+                        setModalState(() {
+                          tempStart = d;
+                          if (tempStart.isAfter(tempEnd))
+                            tempEnd = tempStart.add(const Duration(days: 1));
+                          tempPreset = 'Custom';
+                        });
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _dateFormat.format(tempStart),
+                        style: GoogleFonts.quicksand(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(context)!.endDate,
+                    style: GoogleFonts.quicksand(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: () async {
+                      final d = await showDatePicker(
+                        context: context,
+                        initialDate: tempEnd,
+                        firstDate: tempStart.add(const Duration(days: 1)),
+                        lastDate: DateTime(2100),
+                      );
+                      if (d != null) {
+                        setModalState(() {
+                          tempEnd = d;
+                          tempPreset = 'Custom';
+                        });
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _dateFormat.format(tempEnd),
+                        style: GoogleFonts.quicksand(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            side: BorderSide(color: Colors.grey.shade300),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            AppLocalizations.of(context)!.cancel,
+                            style: GoogleFonts.quicksand(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _startDate = tempStart;
+                              _endDate = tempEnd;
+                              _selectedRangePreset = tempPreset;
+                              _filterData();
+                            });
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            AppLocalizations.of(context)!.apply,
+                            style: GoogleFonts.quicksand(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _fetchData() async {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        if (mounted) setState(() => _isLoading = false);
+        return;
+      }
+
+      final storeId = await inj<ReportDatasource>().getManagerStoreId(user.id);
+      if (storeId == null) {
+        if (mounted) setState(() => _isLoading = false);
+        return;
+      }
+
+      final transactions = await inj<TransactionDatasource>()
+          .getTransactionsByStoreId(storeId);
+
+      if (mounted) {
+        setState(() {
+          _allTransactions = transactions;
+          _filterData();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _filterData() {
+    final filterEnd = _endDate.add(const Duration(days: 1));
+    setState(() {
+      _filteredTransactions = _allTransactions.where((tx) {
+        return tx.createdAt.isAfter(
+              _startDate.subtract(const Duration(seconds: 1)),
+            ) &&
+            tx.createdAt.isBefore(filterEnd);
+      }).toList();
+    });
+  }
+
+  Future<void> _exportToCsv(String extension) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final filename =
+          'transactions_export_${DateTime.now().millisecondsSinceEpoch}.$extension';
+      final path = '${directory.path}/$filename';
+      final file = File(path);
+
+      String csvData =
+          "Transaction code,Transaction date,Status,Customer,Method,Total amount\n";
+
+      for (var data in _filteredTransactions) {
+        csvData +=
+            '"#${data.id}","${_dateFormat.format(data.createdAt)}","${data.paymentStatus}","${data.customerName ?? 'Walk-in'}","${data.paymentMethod}","${data.amount}"\n';
+      }
+
+      await file.writeAsString(csvData);
+
+      if (mounted) {
+        Navigator.pop(context); // close bottom sheet
+        await Share.shareXFiles([
+          XFile(path),
+        ], text: AppLocalizations.of(context)!.exportedTransactionsList);
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackBarHelper.showError(
+          '${AppLocalizations.of(context)!.errorExportingData}$e',
+        );
+      }
+    }
+  }
+
+  void showActionsBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.black87,
+                      size: 28,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 8.0,
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.exportData,
+                    style: GoogleFonts.quicksand(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () => _exportToCsv('csv'),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 14.0,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.insert_drive_file_outlined,
+                          size: 28,
+                          color: Colors.black87,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            'CSV',
+                            style: GoogleFonts.quicksand(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.more_vert, color: Colors.black),
+            onPressed: () => showActionsBottomSheet(context),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: _isLoading
+          ? Center(
+              child: LoadingAnimationWidget.fourRotatingDots(
+                color: ColorTheme.mainAppColor(),
+                size: 40,
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.transactionList,
+                        style: GoogleFonts.quicksand(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        AppLocalizations.of(context)!.completeListTransactions,
+                        style: GoogleFonts.quicksand(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      InkWell(
+                        onTap: _showFilterBottomSheet,
+                        borderRadius: BorderRadius.circular(24),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.tune,
+                                size: 20,
+                                color: Colors.black87,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                _getPresetLabel(context, _selectedRangePreset),
+                                style: GoogleFonts.quicksand(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 20,
+                                color: Colors.black87,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SingleChildScrollView(
+                      child: DataTable(
+                        headingTextStyle: GoogleFonts.quicksand(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        columns: [
+                          DataColumn(
+                            label: Text(
+                              AppLocalizations.of(context)!.transactionCode,
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              AppLocalizations.of(context)!.transactionDate,
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(AppLocalizations.of(context)!.status),
+                          ),
+                          DataColumn(
+                            label: Text(AppLocalizations.of(context)!.customer),
+                          ),
+                          DataColumn(
+                            label: Text(AppLocalizations.of(context)!.method),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              AppLocalizations.of(context)!.totalAmount,
+                            ),
+                          ),
+                        ],
+                        rows: _filteredTransactions.map((data) {
+                          return DataRow(
+                            cells: [
+                              DataCell(
+                                Text(
+                                  '#${data.id}',
+                                  style: GoogleFonts.quicksand(
+                                    color: const Color(0xFF5E5CE6),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  _dateFormat.format(data.createdAt),
+                                  style: GoogleFonts.quicksand(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  data.paymentStatus,
+                                  style: GoogleFonts.quicksand(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  data.customerName ??
+                                      AppLocalizations.of(context)!.walkIn,
+                                  style: GoogleFonts.quicksand(
+                                    color: const Color(0xFF5E5CE6),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  data.paymentMethod,
+                                  style: GoogleFonts.quicksand(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  NumberFormat.currency(
+                                    locale: 'vi_VN',
+                                    symbol: 'đ',
+                                  ).format(data.amount),
+                                  style: GoogleFonts.quicksand(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}

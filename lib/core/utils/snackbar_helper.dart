@@ -7,7 +7,7 @@ class SnackBarHelper {
     final snackBar = SnackBar(
       behavior: SnackBarBehavior.floating,
       margin: const EdgeInsets.only(bottom: 20, left: 16, right: 16),
-      backgroundColor: const Color(0xFFC91A3E), // Màu đỏ lỗi
+      backgroundColor: const Color(0xFFC91A3E), 
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -101,7 +101,7 @@ class SnackBarHelper {
   static void showAlert(String alertMessage) {
     final snackBar = SnackBar(
       behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+      margin: const EdgeInsets.only(bottom: 40, left: 16, right: 16),
       backgroundColor: const Color(0xFFC6CED1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

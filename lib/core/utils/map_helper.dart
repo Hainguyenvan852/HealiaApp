@@ -1,11 +1,9 @@
-import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:healio_app/features/explore/data/models/store_model.dart';
+import 'package:healio_app/features/user/explore/data/models/store_model.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -296,46 +294,59 @@ class MapHelper {
     );
   }
 
-  // static Future<void> checkPermission() async {
-  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     Geolocator.openAppSettings();
-  //     Geolocator.openLocationSettings();
-  //   }
+  static Future<PermissionStatus> checkPermission() {
+    return Permission.location.status;
+  }
 
-  //   LocationPermission permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.denied) {
-  //       Geolocator.openLocationSettings();
-  //       throw Exception('Location permissions are denied.');
-  //     }
-  //   }
-  // }
-
-  static Future<void> requestLocationPermission() async {
+  static Future<bool> requestLocationPermission() async {
     PermissionStatus status = await Permission.location.status;
 
     if (status.isGranted) {
       print("Quyền vị trí đã được cấp.");
-      return;
-    }
-
-    status = await Permission.location.request();
-
-    if (status.isGranted) {
-      print("Người dùng vừa đồng ý cấp quyền.");
+      return true;
     } else if (status.isPermanentlyDenied) {
       print("Quyền bị chặn mãi mãi. Mở Cài đặt hệ thống.");
       await openAppSettings();
+      return false;
     } else if (status.isDenied) {
-      print("Người dùng từ chối quyền. Thoát ứng dụng.");
-
-      if (Platform.isAndroid) {
-        SystemNavigator.pop();
-      } else if (Platform.isIOS) {
-        exit(0);
+      status = await Permission.location.request();
+      if (status.isGranted) {
+        print("Người dùng vừa đồng ý cấp quyền.");
+        return true;
+      } else if (status.isPermanentlyDenied) {
+        print("Quyền bị chặn mãi mãi.");
+        return false;
+      } else if (status.isDenied) {
+        print("Người dùng từ chối quyền.");
+        return false;
+      } else {
+        return false;
       }
+    } else {
+      return false;
     }
   }
+
+  // static void _showSettingsDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: Text("Access is blocked.", style: GoogleFonts.quicksand(fontSize: 20, fontWeight: FontWeight.bold)),
+  //       content: Text("To use this feature, you need to go to Settings and grant permission.", style: GoogleFonts.quicksand(fontSize: 16, fontWeight: FontWeight.w600)),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: Text("To later", style: GoogleFonts.quicksand(fontSize: 16, fontWeight: FontWeight.w600, color: ColorTheme.mainAppColor())),
+  //         ),
+  //         ElevatedButton(
+  //           onPressed: () {
+  //             openAppSettings();
+  //             Navigator.pop(context);
+  //           },
+  //           child: Text("Go to settings", style: GoogleFonts.quicksand(fontSize: 16, fontWeight: FontWeight.w600, color: ColorTheme.mainAppColor())),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

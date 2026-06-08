@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:healio_app/features/explore/data/models/address_model.dart';
-import 'package:healio_app/features/explore/presentation/blocs/user_address_bloc.dart';
+import 'package:healio_app/features/user/profile/data/models/address_model.dart';
+import 'package:healio_app/features/user/profile/presentation/blocs/user_address_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../features/auth/presentation/bloc/auth_bloc.dart';
-import '../../features/explore/presentation/pages/add_address_page.dart';
+import '../../features/user/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/user/explore/presentation/pages/add_address_page.dart';
+import '../../l10n/app_localizations.dart';
 
 class BottomSheetHelper {
   static void showLogOutBottomSheet(
@@ -25,7 +26,7 @@ class BottomSheetHelper {
         child: BlocConsumer<AuthBloc, OAuthState>(
           listener: (context, state) {
             if (state is AuthSignedOutSuccess) {
-              Navigator.pop(sheetContext);
+              Navigator.canPop(sheetContext);
             }
           },
           builder: (context, state) {
@@ -48,26 +49,19 @@ class BottomSheetHelper {
                       children: [
                         const SizedBox(height: 70),
                         Text(
-                          'Log out?',
+                          AppLocalizations.of(context)!.logout + '?',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 25,
                           ),
                         ),
                         const SizedBox(height: 30),
-                        RichText(
-                          text: TextSpan(
-                            text: 'Are you sure you want to log out of\n',
-                            style: TextStyle(color: Colors.black, fontSize: 17),
-                            children: [
-                              TextSpan(
-                                text: 'hainguyenvan852@gmail.com',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
+                        Text(
+                          AppLocalizations.of(context)!.logoutMessage,
+                          style: GoogleFonts.quicksand(
+                            color: Colors.black,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 60),
@@ -80,7 +74,7 @@ class BottomSheetHelper {
                                 onPressed: state is AuthLoading
                                     ? null
                                     : () {
-                                        Navigator.pop(sheetContext);
+                                        Navigator.canPop(sheetContext);
                                       },
                                 style: FilledButton.styleFrom(
                                   backgroundColor: Colors.white,
@@ -91,7 +85,7 @@ class BottomSheetHelper {
                                   ),
                                 ),
                                 child: Text(
-                                  'Go back',
+                                  AppLocalizations.of(context)!.back,
                                   style: GoogleFonts.quicksand(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -105,7 +99,10 @@ class BottomSheetHelper {
                               child: FilledButton(
                                 onPressed: state is AuthLoading
                                     ? null
-                                    : signOut,
+                                    : () {
+                                        Navigator.pop(sheetContext);
+                                        signOut();
+                                      },
                                 style: FilledButton.styleFrom(
                                   backgroundColor: Colors.black,
                                   minimumSize: Size(double.infinity, 45),
@@ -119,7 +116,7 @@ class BottomSheetHelper {
                                             ),
                                       )
                                     : Text(
-                                        'Confirm',
+                                        AppLocalizations.of(context)!.confirm,
                                         style: GoogleFonts.quicksand(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -187,7 +184,9 @@ class BottomSheetHelper {
                       children: [
                         const SizedBox(height: 70),
                         GestureDetector(
+                          behavior: HitTestBehavior.opaque,
                           onTap: () {
+                            Navigator.pop(sheetContext);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -200,11 +199,9 @@ class BottomSheetHelper {
                                 ),
                               ),
                             );
-                            Navigator.pop(sheetContext);
                           },
                           child: Container(
                             alignment: Alignment.centerLeft,
-                            color: Colors.transparent,
                             height: 40,
                             width: double.infinity,
                             child: Text(
@@ -218,19 +215,90 @@ class BottomSheetHelper {
                         ),
                         const SizedBox(height: 10),
                         GestureDetector(
+                          behavior: HitTestBehavior.opaque,
                           onTap: () {
-                            context.read<UserAddressBloc>().add(
-                              DeleteUserAddress(
-                                addressId: address.id,
-                                userId: userId,
+                            Navigator.pop(sheetContext);
+                            showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 40,
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'Are you sure you want to delete this address?',
+                                        style: GoogleFonts.quicksand(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 30),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 2,
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                'No',
+                                                style: GoogleFonts.quicksand(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 20),
+                                          Expanded(
+                                            flex: 3,
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.black,
+                                              ),
+                                              onPressed: () {
+                                                context
+                                                    .read<UserAddressBloc>()
+                                                    .add(
+                                                      DeleteUserAddress(
+                                                        addressId: address.id,
+                                                        userId: userId,
+                                                      ),
+                                                    );
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                'Yes',
+                                                style: GoogleFonts.quicksand(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             );
-                            Navigator.pop(sheetContext);
                           },
                           child: Container(
                             alignment: Alignment.centerLeft,
-                            height: 40,
                             color: Colors.transparent,
+                            height: 40,
                             width: double.infinity,
                             child: Text(
                               'Delete',
@@ -266,20 +334,17 @@ class BottomSheetHelper {
     );
   }
 
-  static Future<void> showExitConfirmationBottomSheet(
-    {
-      required BuildContext context,
-      required VoidCallback onExit
-    }
-  ) async {
+  static Future<void> showExitConfirmationBottomSheet({
+    required BuildContext context,
+    required VoidCallback onExit,
+  }) async {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return Container(
-          height:
-              MediaQuery.of(context).size.height * 0.9,
+          height: MediaQuery.of(context).size.height * 0.9,
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(

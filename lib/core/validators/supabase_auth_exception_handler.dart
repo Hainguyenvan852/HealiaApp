@@ -48,6 +48,16 @@ class SupabaseAuthExceptionHandler {
       return 'Failed to sign in: Bad ID token';
     }
 
+    if (message.contains(
+      'New password should be different from the old password',
+    )) {
+      return 'New password should be different from the old password.';
+    }
+
+    if (message.contains('Error confirming user')) {
+      return 'Error confirming user. Please try again.';
+    }
+
     return message;
   }
 }

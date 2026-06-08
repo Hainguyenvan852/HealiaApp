@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:healio_app/l10n/app_localizations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -25,28 +26,7 @@ class _LandingPageState extends State<LandingPage>
 
   int _currentPage = 0;
 
-  final List<Map<String, dynamic>> _pagesData = [
-    {
-      'title': 'Tìm kiếm Dễ dàng',
-      'description': 'Tìm spa, cắt tóc, nails... ngay gần bạn.',
-      'animationPath': 'assets/animations/search-animation.json',
-    },
-    {
-      'title': 'Làm đẹp Trọn gói',
-      'description': 'Đặt lịch làm nails, makeup, tattoo... trong nháy mắt.',
-      'animationPath': 'assets/animations/girl-face-animation.json',
-    },
-    {
-      'title': 'Tóc Đẹp Mỗi Ngày',
-      'description': 'Cắt, gội, sấy... tại các salon uy tín.',
-      'animationPath': 'assets/animations/hair-salon-animation.json',
-    },
-    {
-      'title': 'Tỏa sáng Ngay',
-      'description': 'Bắt đầu khám phá và đặt lịch cho bạn ngay hôm nay.',
-      'animationPath': 'assets/animations/discovere-animation-2.json',
-    },
-  ];
+  final List<Map<String, dynamic>> _pagesData = [];
 
   @override
   void initState() {
@@ -67,6 +47,33 @@ class _LandingPageState extends State<LandingPage>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
+
+    _pagesData.addAll([
+      {
+        'title': 'Easy Search', //'Tìm kiếm Dễ dàng'
+        'description':
+            'Find spas, hair salons, nail salons,... near you.', //'Tìm spa, cắt tóc, nails... ngay gần bạn.'
+        'animationPath': 'assets/animations/search-animation.json',
+      },
+      {
+        'title': 'Complete Beauty Package', //'Làm đẹp Trọn gói'
+        'description':
+            'Book your nail, makeup, or tattoo appointment in an instant.', //'Đặt lịch làm nails, makeup, tattoo... trong nháy mắt.'
+        'animationPath': 'assets/animations/girl-face-animation.json',
+      },
+      {
+        'title': 'Beautiful Hair Every Day', //'Tóc Đẹp Mỗi Ngày'
+        'description':
+            'Haircut, shampoo, blow-dry... at trusted salons.', //'Cắt, gội, sấy... tại các salon uy tín.'
+        'animationPath': 'assets/animations/hair-salon-animation.json',
+      },
+      {
+        'title': 'Shine Brightly Now', //'Tỏa sáng Ngay'
+        'description':
+            'Start exploring and booking for yourself today.', //'Bắt đầu khám phá và đặt lịch cho bạn ngay hôm nay.'
+        'animationPath': 'assets/animations/discovere-animation-2.json',
+      },
+    ]);
 
     _startTimer();
   }
@@ -114,7 +121,7 @@ class _LandingPageState extends State<LandingPage>
             Color.fromARGB(255, 214, 36, 101),
             Color.fromARGB(255, 252, 114, 183),
             Color.fromARGB(255, 253, 208, 231),
-            Colors.white
+            Colors.white,
           ],
         ),
       ),
@@ -211,8 +218,8 @@ class _LandingPageState extends State<LandingPage>
                           ),
                           elevation: 0,
                         ),
-                        child: const Text(
-                          'Bắt đầu khám phá',
+                        child: Text(
+                          AppLocalizations.of(context)!.startExploring,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -277,7 +284,11 @@ class _LandingPageState extends State<LandingPage>
           Text(
             data['description'],
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18, height: 1.5, color: Color.fromARGB(255, 214, 36, 101)),
+            style: TextStyle(
+              fontSize: 18,
+              height: 1.5,
+              color: Color.fromARGB(255, 214, 36, 101),
+            ),
           ),
         ],
       ),

@@ -20,6 +20,22 @@ String? emptyPasswordValidation(String? value) {
   return null;
 }
 
+String? passwordValidation(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Password is required';
+  }
+  if (value.length < 6) {
+    return 'Password must be at least 6 characters';
+  }
+  final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
+  final hasNumber = RegExp(r'\d').hasMatch(value);
+
+  if (!hasLetter || !hasNumber) {
+    return 'Password must contain at least one letter and one number';
+  }
+  return null;
+}
+
 String? emptyValidation(String? value) {
   if (value == null || value.isEmpty) {
     return 'Field is required';
@@ -52,9 +68,9 @@ String? doubleValidation(String? value) {
 }
 
 String? confirmPasswordValidation(
-    String? value,
-    TextEditingController controller,
-    ) {
+  String? value,
+  TextEditingController controller,
+) {
   if (value == null || value.isEmpty) {
     return 'Password is required';
   }
