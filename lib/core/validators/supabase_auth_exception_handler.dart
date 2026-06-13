@@ -19,7 +19,7 @@ class SupabaseAuthExceptionHandler {
     }
 
     if (message.contains('User not found')) {
-      return 'No account found with that email.';
+      return 'No account found with that email';
     }
 
     if (message.contains(
@@ -51,11 +51,15 @@ class SupabaseAuthExceptionHandler {
     if (message.contains(
       'New password should be different from the old password',
     )) {
-      return 'New password should be different from the old password.';
+      return 'New password should be different from the old password';
     }
 
     if (message.contains('Error confirming user')) {
-      return 'Error confirming user. Please try again.';
+      return 'Error confirming user. Please try again';
+    }
+
+    if (message.contains('Error sending recovery email')) {
+      return 'Your account does not exist, or you have logged in using a different method';
     }
 
     return message;

@@ -7,7 +7,6 @@ import 'package:healio_app/core/utils/date_time_helper.dart';
 import 'package:healio_app/features/user/auth/domain/usecases/check_user_session_usecase.dart';
 import 'package:healio_app/features/user/explore/presentation/blocs/search_cubit.dart';
 import 'package:healio_app/features/user/explore/presentation/blocs/search_state.dart';
-import 'package:healio_app/features/user/explore/presentation/widgets/recent_search_card.dart';
 import 'package:healio_app/features/user/explore/presentation/widgets/search_text_field_2.dart';
 import 'package:healio_app/l10n/app_localizations.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -155,29 +154,29 @@ class _SearchPageState extends State<SearchPage> {
                       onTap: () => _locationSearchOnTap(),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: SearchTextField2(
-                      content: state.timeText.toLowerCase() != 'custom'
-                          ? state.timeText
-                          : DateTimeHelper.transformTime24To12(
-                                  state.startTime!.hour,
-                                  0,
-                                ) +
-                                ' - ' +
-                                DateTimeHelper.transformTime24To12(
-                                  state.endTime!.hour,
-                                  0,
-                                ),
-                      secondContent: state.dateText,
-                      iconWidget: PhosphorIcon(
-                        PhosphorIcons.calendarBlank(),
-                        size: 20,
-                      ),
-                      onTap: () => _timeSearchOnTap(state),
-                    ),
-                  ),
+                  // const SizedBox(height: 10),
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  //   child: SearchTextField2(
+                  //     content: state.timeText.toLowerCase() != 'custom'
+                  //         ? state.timeText
+                  //         : DateTimeHelper.transformTime24To12(
+                  //                 state.startTime!.hour,
+                  //                 0,
+                  //               ) +
+                  //               ' - ' +
+                  //               DateTimeHelper.transformTime24To12(
+                  //                 state.endTime!.hour,
+                  //                 0,
+                  //               ),
+                  //     secondContent: state.dateText,
+                  //     iconWidget: PhosphorIcon(
+                  //       PhosphorIcons.calendarBlank(),
+                  //       size: 20,
+                  //     ),
+                  //     onTap: () => _timeSearchOnTap(state),
+                  //   ),
+                  // ),
 
                   // FutureBuilder(
                   //     future: recentSearchFuture,

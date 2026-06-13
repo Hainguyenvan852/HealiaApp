@@ -45,36 +45,6 @@ class _AppState extends State<App> {
     ) async {
       AuthChangeEvent event = data.event;
       final session = data.session;
-      // if (event == AuthChangeEvent.initialSession) {
-      //   final router = _appRouter.route;
-
-      //   final prefs = await SharedPreferences.getInstance();
-      //   final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
-
-      //   if (isFirstLaunch) {
-      //     await prefs.setBool('isFirstLaunch', false);
-      //     router.go('/landing');
-      //     return;
-      //   }
-
-      //   final session = inj<CheckUserSessionUseCase>().call();
-      //   if (session != null) {
-      //     UserModel userInfo = await inj<GetUserInfoUseCase>().call(
-      //       session.user.id,
-      //     );
-      //     if (userInfo.role == 'manager') {
-      //       if (userInfo.verifyStore != null && userInfo.verifyStore!) {
-      //         router.go('/manager-navigator', extra: userInfo);
-      //       } else {
-      //         router.go('/incomplete-registration');
-      //       }
-      //     } else {
-      //       router.go('/home');
-      //     }
-      //   } else {
-      //     router.go('/home');
-      //   }
-      // } else
       if (event == AuthChangeEvent.passwordRecovery) {
         final router = _appRouter.route;
         final state = router.routerDelegate.currentConfiguration;
